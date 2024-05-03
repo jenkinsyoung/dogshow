@@ -1,11 +1,11 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 const port = 8082; // Порт, на котором будет работать ваш сервер
-
+app.use(cors());
+app.use(express.json())
 // Определение маршрутов
-app.get('/', (req, res) => {
-  res.send('Привет, мир!');
-});
+
 
 // Запуск сервера
 app.listen(port, () => {
@@ -23,16 +23,48 @@ const pool = new Pool({
   port: 5432,
 });
 
-pool.query(`
-  SELECT table_name
-  FROM information_schema.tables
-  WHERE table_schema = 'public'
-  AND table_type = 'BASE TABLE';
-`, (err, res) => {
-  if (err) {
-    console.error('Ошибка при выполнении запроса:', err.stack);
-  } else {
-    console.log('Список таблиц:', res.rows);
+
+app.get('/auth', async (req, res) => {
+  const login = req.query.login;
+  try {
+    const searchLogin  = login;
+
+    // Подготавливаем SQL-запрос с параметрами
+    const query = {
+      text: 'SELECT * FROM "user" WHERE login ILIKE $1',
+      values: [`%${searchLogin}%`],
+    };
+
+    // Выполняем запрос к базе данных
+    const result = await pool.query(query);
+
+    // Отправляем найденные данные клиенту
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error searching in database:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
-  pool.end();
 });
+
+app.post('/user', async (req, res) =>{
+  try {
+    const { name, surname, patronymic, login, password } = req.body;
+
+    // Проверяем, существует ли пользователь с таким именем
+    const userExists = await pool.query('SELECT * FROM "user" WHERE login = $1', [login]);
+    if (userExists.rows.length > 0) {
+      return res.status(400).json({ error: 'Username already exists' });
+    }
+
+    const id = (await pool.query('SELECT * FROM "user"')).rowCount + 1
+  
+    // Добавляем нового пользователя в базу данных
+    const newUser = await pool.query('INSERT INTO "user" (id, name, surname, patronymic, login, password) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *', [id, name, surname, patronymic, login, password]);
+
+    res.status(201).json(newUser.rows[0]);
+  } catch (error) {
+    console.error('Error registering user:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+)

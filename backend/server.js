@@ -46,7 +46,7 @@ app.get('/auth', async (req, res) => {
   }
 });
 
-app.post('/user', async (req, res) =>{
+app.post('/register', async (req, res) =>{
   try {
     const { name, surname, patronymic, login, password } = req.body;
 

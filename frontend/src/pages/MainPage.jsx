@@ -1,7 +1,7 @@
 import SignIn from "../components/SignIn";
 import Video from "../components/Video";
 import { useState } from "react";
-const MainPage = () =>{
+const MainPage = (setLoggedIn) =>{
   const ButtonStyle={
     position: 'absolute',
     top: '8px',
@@ -19,7 +19,7 @@ const MainPage = () =>{
     <div>
       <Video />
       <button style={ButtonStyle} onClick={handleClick}>Войти</button>
-      {overlay ? <SignIn /> : <></>}
+      {overlay ? <SignIn  LoggedIn = {setLoggedIn}/> : <></>}
     </div>
   );
 }

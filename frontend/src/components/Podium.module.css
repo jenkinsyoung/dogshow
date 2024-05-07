@@ -1,0 +1,81 @@
+.container{
+    width: 329px;
+    height: 240px;
+    box-sizing: border-box;
+    border: 2px solid rgb(255, 181, 167);
+    border-radius: 3px;
+    background: rgba(248, 237, 235, 0.21);
+
+}
+.container h2.ring{
+    width: 100%;
+    height: 27px;
+    color: rgb(180, 165, 159);
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: 0px;
+    text-align: center;
+    margin-top: 4px;
+}
+.places{
+    margin:auto;
+    width: 296px;
+    display: grid;
+    grid-template-columns: repeat(3, 98px);
+    grid-column-gap: 1px;
+}
+.participant{
+    display: flex;
+    margin-bottom: 4px;
+}
+.photo{
+    margin:auto;
+    width:30px;
+    height:30px;
+    background-color: grey;
+}
+.nickname{
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 15px;
+    letter-spacing: 0px;
+    margin: auto;
+    text-align: center;
+    color: rgb(6, 5, 7);
+}
+.second_pedestal, .first_pedestal, .third_pedestal{
+    width: 100%;
+    background: rgb(249, 220, 196);
+    align-items: center;
+}
+.number_place{
+    width: 100%;
+    text-align: center;
+    height: 49px;
+    padding-top:10px;
+    color: rgb(254, 251, 251);
+    font-size: 40px;
+    font-weight: 400;
+    line-height: 48px;
+    letter-spacing: 0px;
+    text-align: center;
+}
+.second_pedestal{
+    height: 87px;
+}
+.first_pedestal{
+    height: 117px;
+}
+.third_pedestal{
+    height: 63px;
+}
+.two{
+    margin-top: 61px;   
+}
+.one{
+    margin-top: 31px;  
+}
+.three{
+    margin-top: 85px;  
+}

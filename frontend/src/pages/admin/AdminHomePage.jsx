@@ -1,27 +1,24 @@
 import React, {useEffect, useState, createRef} from 'react'
-import {
-    BrowserRouter as Router,
-    Route,
-    Link,
-    Routes
-} from 'react-router-dom';
-import style from './HomePage.module.css';
-import Slider from '../components/Slider';
-const HomePage = () => {
+import { Link } from 'react-router-dom';
+import style from './AdminHomePage.module.css';
+import Podium from '../../components/Podium';
+import { getTodayDate } from '../../utils/time';
+import Countdown from '../../components/Timer';
+const AdminPage = () => {
     return(
-    <Router>
+        <>
         <header>
 
-                <Link to="/"><img className={style.image} src='/logo.png' alt=''/></Link>
+                <Link to="/home"><img className={style.image} src='/logo.png' alt=''/></Link>
              
             <nav className={style.navbar}>
                     
                     {/* <div>BarkFest</div> */}
                     <li>
-                        <Link to="/participants">Участники</Link>
+                        <Link to="/home/participants">Участники</Link>
                     </li>
                     <li>
-                        <Link to="/clubs">Клубы</Link>
+                        <Link to="/home/clubs">Клубы</Link>
                     </li>
                     <li>
                         <Link to="/rings">Ринги</Link>
@@ -35,21 +32,16 @@ const HomePage = () => {
         </header>
 
         <main>
-            <Routes>
-                <Route path="/participants" element={<About />}/>
-                <Route path="/clubs" element={<About />}/>
-                <Route path="/rings"element={<About />}/>
-                <Route path="/experts" element={<About />}/>
-                <Route path="/" element={<Home />} />
-            </Routes>
+            <Home />
         </main>
-    </Router>
+    </>
     )
 }
 
-export default HomePage
+export default AdminPage
 
 const Home = () => {
+    const todayDate = getTodayDate();
     const [value, setValue] = useState(0); // Используем state для хранения значения input
     const pieChartRef = createRef(); // Создаем ref для доступа к элементу .pie-chart
 
@@ -75,9 +67,9 @@ const Home = () => {
             </div>
         </div>
         <div className={style.second}>
-            <div className={style.date}>27 апреля 2024</div>
+            <div className={style.date}>{todayDate}</div>
             <div className={style.info}>Время до начала выставки</div>
-            <div className={style.timer}>00:00:00</div>
+            <div className={style.timer}><Countdown /></div>
             <div className={`${style.info}  && ${style.in}`}>Дата начала выставки: <span>15.06.2024</span></div>
             <div className={`${style.info}  && ${style.in}`}>Количество рингов: <span>20</span></div>
             <button>Принять участие</button>
@@ -94,20 +86,14 @@ const Home = () => {
         </div>
     
     </div>  
-    <label>
-            <span>Значение (%)</span>
-            <input type="number" min="0" max="100" value={value} onChange={(e) => setValue(parseInt(e.target.value))} />
-     </label>
+    <input type="hidden" min="0" max="100" value={value} onChange={(e) => setValue(parseInt(e.target.value))} />
      <div>
-     <Slider />
+     <img src="/line.svg" alt="" className={style.line} />
      </div>
-     
+     <div className={style.rewards}>
+        <h1>Наши победители</h1>
+        <Podium />
+     </div>
     </>
  )
-}
-
-const About = () => {
-    return(
-       <h2>О</h2>
-    )
 }

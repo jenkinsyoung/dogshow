@@ -1,7 +1,7 @@
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore from 'swiper';
-import  { Navigation, Pagination, EffectCoverflow } from "swiper/modules";
+import  { Navigation, Pagination, EffectCoverflow, Autoplay, Mousewheel } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/effect-coverflow";
@@ -15,7 +15,7 @@ import image_5 from '../assets/image/img_5.jpg'
 import image_6 from '../assets/image/img_6.jpg'
 import image_7 from '../assets/image/img_7.jpg'
 import image_8 from '../assets/image/img_8.jpg'
-SwiperCore.use([Navigation, Pagination, EffectCoverflow]);
+SwiperCore.use([Navigation, Pagination, EffectCoverflow, Autoplay, Mousewheel]);
 
 export default function SwiperCoverflow() {
   return (
@@ -27,6 +27,10 @@ export default function SwiperCoverflow() {
         <p></p>
       </div>
       <Swiper
+      mousewheel={true}
+        autoplay={{
+          "delay": 2500
+        }}
         navigation
         pagination={{ clickable: true }}
         effect="coverflow"
@@ -37,6 +41,7 @@ export default function SwiperCoverflow() {
           modifier: 2,
           slideShadows: true
         }}
+        modules={[Mousewheel, Pagination]}
         slidesPerView={2}
         centeredSlides
         style={{ width: '650px', height: "500px", margin:'auto' }}

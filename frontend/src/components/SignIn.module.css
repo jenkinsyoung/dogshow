@@ -108,7 +108,7 @@ form input{
     border-bottom: 2px solid rgb(255, 181, 167);
     border-radius: 3px;
     background: rgb(248, 237, 235);
-    color: rgb(180, 165, 159);
+    color: rgb(98, 90, 87);
     font-size: 18px;
     font-weight: 400;
     line-height: 22px;
@@ -117,6 +117,9 @@ form input{
     margin-bottom: 30px;
 }
 
+form input::placeholder{
+    color: rgb(180, 165, 159);
+}
 form button{
     width: 350px;
     height: 31px;
@@ -147,4 +150,21 @@ form span{
     margin:0;
     color: rgb(6, 5, 7);
     cursor: pointer;
+}
+
+form select{
+    width: 350px;
+    height: 31px;
+    box-sizing: border-box;
+    border: none;
+    border-bottom: 2px solid rgb(255, 181, 167);
+    border-radius: 3px;
+    background: rgb(248, 237, 235);
+    color: rgb(180, 165, 159);
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 22px;
+    letter-spacing: 0px;
+    text-align: center;
+    margin-bottom: 30px;
 }

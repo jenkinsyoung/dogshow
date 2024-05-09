@@ -8,7 +8,6 @@ const MyPetsPage = () => {
   return (
         <>
         <HeaderUser />
-
         <main>
             <Pets />
         </main>
@@ -45,7 +44,18 @@ const Pets =() =>{
 
     return(
         <>
-            <button className={style.add}>Добавить питомца</button>
+        <div className={style.menu_btn}>
+            <div>
+                <button className={style.add}>Добавить питомца</button>
+                <button className={style.add}>Фильтры для поиска</button>
+            </div>
+            <div>
+                <button className={style.join}>Подать завку на участие</button>
+                <button className={style.delete}>Удалить</button>
+            </div>
+            
+        </div>
+            
             {dogs.length ? dogs.map(dog=><Dog dog={dog} />) : <div>У вас не добавлен ни один питомец</div>}
         </>
     )

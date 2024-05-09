@@ -12,6 +12,7 @@ import MainPage from './pages/MainPage';
 import HomePage from './pages/user/HomePage';
 import MyPetsPage from './pages/user/MyPetsPage';
 import AdminPage from './pages/admin/AdminHomePage';
+import ProfilePage from './pages/user/ProfilePage';
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -19,7 +20,7 @@ const router = createBrowserRouter(
     <Route path="/admin" element={<AdminPage />} />
     <Route path="/home" element={<HomePage />} />
     <Route path="/home/pets" element={<MyPetsPage />} />
-    
+    <Route path="/profile" element={<ProfilePage />} />
     </>
   )
 );

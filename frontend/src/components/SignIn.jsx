@@ -4,22 +4,33 @@ import { useState } from 'react';
 import style from './SignIn.module.css'
 import { useForm } from 'react-hook-form';
 import { useNavigate} from 'react-router-dom';
+import{ jwtDecode} from 'jwt-decode';
 const SignIn = () => {
   const navigate = useNavigate()
   const [loggedIn, setLoggedIn] = useState(false);
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
   const handleLogin =async () => {
     try {
-      const response = await axios.get(`http://localhost:8082/auth?login=${login}`);
-      const compare = response.data[0]
-      if( password === compare.password) {
+      await axios.get(`http://localhost:8082/auth?login=${login}`).then(data=>
+        {
+          localStorage.setItem('token', data.data.token);
+        }
+      );
+      const token = localStorage.getItem('token')
+      if(token){
+        const decodedToken = jwtDecode(token);
+        const role_id = decodedToken.role_id;
+        const pass = decodedToken.password;
+
+      if( password === pass) {
         setLoggedIn(true);
-        if(compare.role_id === '2')navigate('/home')
+        if(role_id === '2') navigate('/home')
         else navigate('/admin')
       }
-      else {setError('Неверное имя пользователя или пароль');}
+      else {setError('Неверное имя пользователя или пароль');}}
     } catch (error) {
       console.error('Error searching:', error);
     }
@@ -43,13 +54,16 @@ const SignIn = () => {
         role_id: data.role_id
     }
     try{
-        const response = await axios.post('http://localhost:8082/register', new_data);
-        console.log(response)
+        await axios.post('http://localhost:8082/register', new_data)
+        .then(data=>{
+          localStorage.setItem('token', data.data.token);
+        });
+        
         navigate("/home")
     }
     catch (error){
         console.error('Error searching:', error);
-    }; //отправка запроса на бэк
+    }; 
 }}
         
   return (

@@ -1,32 +1,13 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
 import style from './MyPetsPage.module.css'
+import HeaderUser from '../../components/HeaderUser'
+import { jwtDecode } from 'jwt-decode'
+import axios from 'axios'
+import Dog from '../../components/Dog'
 const MyPetsPage = () => {
   return (
         <>
-        <header>
-
-                <Link to="/home"><img className={style.image} src='/logo.png' alt=''/></Link>
-             
-            <nav className={style.navbar}>
-                    
-                    {/* <div>BarkFest</div> */}
-                    <li>
-                        <Link to="/home/pets">Мои питомцы</Link>
-                    </li>
-                    <li>
-                        <Link to="/home/clubs">Клубы</Link>
-                    </li>
-                    <li>
-                        <Link to="/rings">Ринги</Link>
-                    </li>
-                    <li>
-                        <Link to="/experts">Эксперты</Link>
-                    </li>
-            </nav>
-            <Link to="/"><img className={style.profile} src='/profile.svg' alt=''/></Link>
-            <Link to="/"><img className={style.out} src='/logout.svg' alt=''/></Link>
-        </header>
+        <HeaderUser />
 
         <main>
             <Pets />
@@ -38,10 +19,34 @@ const MyPetsPage = () => {
 export default MyPetsPage
 
 const Pets =() =>{
+    const [dogs, setDogs] =useState([])
+    const [userId, setUserId] = useState('')
+    useEffect(()=>{
+        const token = localStorage.getItem('token');
+        if(token){
+            const decodedToken = jwtDecode(token);
+            setUserId(decodedToken.userId);
+        }
+    }, [])
+    useEffect(()=>{
+        const fetchData = async () => {
+            try {
+                const data = await axios.get(`http://localhost:8082/dogs?userId=${userId}`);
+                setDogs(data.data); // Предполагая, что данные возвращаются в формате { data: [...] }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        if (userId) {
+            fetchData();
+        }
+    }, [userId]);
 
     return(
         <>
             <button className={style.add}>Добавить питомца</button>
+            {dogs.length ? dogs.map(dog=><Dog dog={dog} />) : <div>У вас не добавлен ни один питомец</div>}
         </>
     )
 }

@@ -5,13 +5,13 @@ import { jwtDecode } from 'jwt-decode'
 // import { useNavigate} from 'react-router-dom';
 const ProfilePage = () => {
   return (
-    <>
+    <div className='page'>
         <HeaderUser />
 
         <main>
             <Profile />
         </main>
-    </>
+    </div>
   )
 }
 

@@ -43,4 +43,6 @@
   
 .info p {
     line-height: 1.6;
+    font-size: 1rem;
+    color: #717171;
   }

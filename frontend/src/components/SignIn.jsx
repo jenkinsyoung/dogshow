@@ -28,6 +28,8 @@ const SignIn = () => {
       if( password === pass) {
         setLoggedIn(true);
         if(role_id === '2') navigate('/home')
+        else if(role_id === '3') navigate('/expert')
+        else if(role_id === '4') navigate('/club')
         else navigate('/admin')
       }
       else {setError('Неверное имя пользователя или пароль');}}

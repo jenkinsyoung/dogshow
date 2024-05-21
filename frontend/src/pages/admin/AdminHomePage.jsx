@@ -1,40 +1,28 @@
 import React, {useEffect, useState, createRef} from 'react'
-import { Link } from 'react-router-dom';
 import style from './AdminHomePage.module.css';
 import Podium from '../../components/Podium';
 import { getTodayDate } from '../../utils/time';
 import Countdown from '../../components/Timer';
+import HeaderAdmin from '../../components/HeaderAdmin';
+import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from 'react-router-dom';
 const AdminPage = () => {
+    const navigate=useNavigate();
+    useEffect(()=>{
+        const token = localStorage.getItem('token');
+        if(token){
+            const decodedToken = jwtDecode(token);
+            if(decodedToken.role_id !== "1") navigate("/forbidden");
+        }
+    })
     return(
-        <>
-        <header>
-
-                <Link to="/home"><img className={style.image} src='/logo.png' alt=''/></Link>
-             
-            <nav className={style.navbar}>
-                    
-                    {/* <div>BarkFest</div> */}
-                    <li>
-                        <Link to="/home/participants">Участники</Link>
-                    </li>
-                    <li>
-                        <Link to="/home/clubs">Клубы</Link>
-                    </li>
-                    <li>
-                        <Link to="/rings">Ринги</Link>
-                    </li>
-                    <li>
-                        <Link to="/experts">Эксперты</Link>
-                    </li>
-            </nav>
-            <Link to="/"><img className={style.profile} src='/profile.svg' alt=''/></Link>
-            <Link to="/"><img className={style.out} src='/logout.svg' alt=''/></Link>
-        </header>
+        <div className='page'>
+        <HeaderAdmin />
 
         <main>
             <Home />
         </main>
-    </>
+    </div>
     )
 }
 
@@ -72,7 +60,7 @@ const Home = () => {
             <div className={style.timer}><Countdown /></div>
             <div className={`${style.info}  && ${style.in}`}>Дата начала выставки: <span>15.06.2024</span></div>
             <div className={`${style.info}  && ${style.in}`}>Количество рингов: <span>20</span></div>
-            <button>Принять участие</button>
+            <button>Изменить данные о выставке</button>
 
         </div>
         <div className={style.third}>
@@ -88,7 +76,7 @@ const Home = () => {
     </div>  
     <input type="hidden" min="0" max="100" value={value} onChange={(e) => setValue(parseInt(e.target.value))} />
      <div>
-     <img src="/line.svg" alt="" className={style.line} />
+     <img src="/line.svg" alt="" className={style.line} style={{marginTop: '20px'}} />
      </div>
      <div className={style.rewards}>
         <h1>Наши победители</h1>

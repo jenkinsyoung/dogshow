@@ -350,3 +350,8 @@ template {
 body{
   font-family: "Nunito", sans-serif;
 }
+
+.page{
+  max-width: 1600px; 
+  margin: auto;
+}

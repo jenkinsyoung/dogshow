@@ -1,32 +1,24 @@
 import React, {useEffect, useState, createRef} from 'react'
 import style from './HomePage.module.css';
-import HeaderUser from '../../components/HeaderUser';
+import HeaderExpert from '../../components/HeaderExpert';
 import Slider from '../../components/Slider';
 import Podium from '../../components/Podium';
 import { getTodayDate } from '../../utils/time';
 import Countdown from '../../components/Timer';
-import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
-const HomePage = () => {
-    const navigate=useNavigate();
-    useEffect(()=>{
-        const token = localStorage.getItem('token');
-        if(token){
-            const decodedToken = jwtDecode(token);
-            if(decodedToken.role_id !== "2") navigate("/forbidden");
-        }
-    })
+const ExpertHomePage = () => {
     return(
+        <>
         <div className='page'>
-        <HeaderUser />
+        <HeaderExpert />
         <main>
             <Home />
         </main>
         </div>
+    </>
     )
 }
 
-export default HomePage
+export default ExpertHomePage
 
 const Home = () => {
     const todayDate = getTodayDate();
@@ -57,10 +49,10 @@ const Home = () => {
         <div className={style.second}>
             <div className={style.date}>{todayDate}</div>
             <div className={style.info}>Время до начала выставки</div>
-            <div className={style.timer}><Countdown/></div>
+            <div className={style.timer}><Countdown /></div>
             <div className={`${style.info}  && ${style.in}`}>Дата начала выставки: <span>15.06.2024</span></div>
             <div className={`${style.info}  && ${style.in}`}>Количество рингов: <span>20</span></div>
-            <button>Принять участие</button>
+            <button>Подать заявку</button>
 
         </div>
         <div className={style.third}>

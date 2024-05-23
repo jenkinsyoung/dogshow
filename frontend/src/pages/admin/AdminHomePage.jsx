@@ -6,6 +6,7 @@ import Countdown from '../../components/Timer';
 import HeaderAdmin from '../../components/HeaderAdmin';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
+import SwiperCoverflow from '../../components/Slider';
 const AdminPage = () => {
     const navigate=useNavigate();
     useEffect(()=>{
@@ -18,7 +19,6 @@ const AdminPage = () => {
     return(
         <div className='page'>
         <HeaderAdmin />
-
         <main>
             <Home />
         </main>
@@ -60,8 +60,6 @@ const Home = () => {
             <div className={style.timer}><Countdown /></div>
             <div className={`${style.info}  && ${style.in}`}>Дата начала выставки: <span>15.06.2024</span></div>
             <div className={`${style.info}  && ${style.in}`}>Количество рингов: <span>20</span></div>
-            <button>Изменить данные о выставке</button>
-
         </div>
         <div className={style.third}>
         <div className={style.pieChart} ref={pieChartRef}>
@@ -75,6 +73,7 @@ const Home = () => {
     
     </div>  
     <input type="hidden" min="0" max="100" value={value} onChange={(e) => setValue(parseInt(e.target.value))} />
+    <SwiperCoverflow />
      <div>
      <img src="/line.svg" alt="" className={style.line} style={{marginTop: '20px'}} />
      </div>

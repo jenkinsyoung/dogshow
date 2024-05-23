@@ -13,8 +13,6 @@ const HeaderExpert = () => {
                 <Link to="/expert"><img className={style.image} src='/logo.png' alt=''/></Link>
              
             <nav className={style.navbar}>
-                    
-                    {/* <div>BarkFest</div> */}
                     <li>
                         <Link to="/expert/pets">Участники</Link>
                     </li>
@@ -22,10 +20,10 @@ const HeaderExpert = () => {
                         <Link to="/expert/clubs">Клубы</Link>
                     </li>
                     <li>
-                        <Link to="/rings">Ринги</Link>
+                        <Link to="expert/rings">Ринги</Link>
                     </li>
             </nav>
-            <Link to="/profile"><img className={style.profile} src='/profile.svg' alt=''/></Link>
+            <Link to="/expert/profile"><img className={style.profile} src='/profile.svg' alt=''/></Link>
             <img className={style.out} onClick={logout} src='/logout.svg' alt=''/>
         </header>
   )

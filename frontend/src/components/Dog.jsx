@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import style from './Dog.module.css'
 import EditDog from './EditDog'
+import DogSwiper from './DogSwiper'
 const Dog = ({dog}) => {
     const [overlay, setOverlay] = useState(false)
     const handleClick =()=>{
@@ -11,11 +12,9 @@ const Dog = ({dog}) => {
     {overlay? <EditDog params = {dog} /> : <></>}
     <div className={style.container}>
         {dog.images && dog.images.length > 0 && dog.images[0] ? (
-          dog.images.map((image, index) => (
-            <div key={index} style={{backgroundImage: `url(${image})`}} className={style.img}/>
-          ))
+        <DogSwiper photo={dog.images} />
         ) : (
-          <p>No images available</p>
+          <p style={{padding:'5px', fontSize: '18px'}}>Не загружены фотографии</p>
         )}
         <div className={style.info_dog}>
         <div className={style.nickname}>
@@ -40,53 +39,37 @@ const Dog = ({dog}) => {
                 </div>
                 <div className={style.criterion}>
                     клуб:
-                    <span>{dog.club_id}</span>
+                    <span>{dog.club}</span>
                 </div>
             </div>
             <div className={style.rewards}>
             <p className={style.title}>Награды</p>
                 <div className={style.criterion}>
                 🥇:
-                    <span>{dog.age}</span>
+                    <span>{dog.gold_count}</span>
                 </div>
                 <div className={style.criterion}>
                 🥈:
-                    <span>{dog.breed}</span>
+                    <span>{dog.silver_count}</span>
                 </div>
                 <div className={style.criterion}>
                 🥉:
-                    <span>{dog.vaccination.split('T')[0]}</span>
+                    <span>{dog.bronze_count}</span>
                 </div>
             </div>
             <div className={style.ring}>
             <p className={style.title}>О текущем участии</p>
                 <div className={style.criterion}>
                     Ринг:
-                    <span>{dog.age}</span>
+                    {dog.rings.map(ring=><span>{ring}</span>)}
                 </div>
             </div>
         <div className={style.marks}>
-        <p className={style.title}>Оценки</p>
-            <div className={style.criterion}>
-                Стойка:
-                <span>{dog.age}</span>
-            </div>
-            <div className={style.criterion}>
-                Здоровье:
-                <span>{dog.age}</span>
-            </div>
-            <div className={style.criterion}>
-                Движение:
-                <span>{dog.age}</span>
-            </div>
-            <div className={style.criterion}>
-                Соответствие породе:
-                <span>{dog.age}</span>
-            </div>
-            <div className={style.criterion}>
-                Внешний вид:
-                <span>{dog.age}</span>
-            </div>
+        {dog.marks.length > 0 ? <p className={style.title}>Оценки</p>: <></>}
+        {dog.marks.map((el, index) => <div key={index} className={style.criterion}>
+                {el.criteria}:
+                <span>{el.value}</span>
+            </div>)}
         </div>
         </div>
     </div>

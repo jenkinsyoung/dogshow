@@ -1,11 +1,21 @@
 import React, {useEffect, useState, createRef} from 'react'
-import style from './HomePage.module.css';
+import style from './ExpertHomePage.module.css';
 import HeaderExpert from '../../components/HeaderExpert';
 import Slider from '../../components/Slider';
 import Podium from '../../components/Podium';
 import { getTodayDate } from '../../utils/time';
 import Countdown from '../../components/Timer';
+import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 const ExpertHomePage = () => {
+    const navigate=useNavigate();
+    useEffect(()=>{
+        const token = localStorage.getItem('token');
+        if(token){
+            const decodedToken = jwtDecode(token);
+            if(decodedToken.role_id !== "3") navigate("/forbidden");
+        }
+    })
     return(
         <>
         <div className='page'>

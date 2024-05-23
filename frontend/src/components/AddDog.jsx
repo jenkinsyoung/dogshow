@@ -8,9 +8,9 @@ const ContainerStyle ={
   padding: '0',
   top: '0',
   left: '0',
-  position: 'absolute',
+  position: 'fixed',
   width: '100%',
-  height: '100vh',
+  height: '100%',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
@@ -131,6 +131,9 @@ const AddDog = ({params}) => {
         console.error('Error converting images to Base64', error);
       });
   };
+  const handleImageRemove = (index) => {
+    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+  };
   const handleReload =()=>{
     window.location.reload()
   }
@@ -146,7 +149,28 @@ const AddDog = ({params}) => {
       {error && <p style={{ color: 'red', textAlign: 'center', marginTop: '-20px' }}>{error}</p>}
       <div>
         {images.map((image, index) => (
-          <img key={index} src={image} alt={`upload-${index}`} style={{ width: '50px', margin: '5px' }} />
+          <div key={index} style={{ position: 'relative', display: 'inline-block' }}>
+          <img src={image} alt={`Upload ${index}`} style={{ width: '50px', height: '100%' }} />
+          <button
+            onClick={() => handleImageRemove(index)}
+            style={{
+              position: 'absolute',
+              width: '18px',
+              height: '15px',
+              top: '-20px',
+              right: '1px',
+              backgroundColor: 'transparent',
+              color: 'red',
+              border: 'none',
+              textAlign: 'center',
+              alignItems: 'center',
+              borderRadius: '50%',
+              cursor: 'pointer',
+            }}
+          >
+            &times;
+          </button>
+        </div>
         ))}
       </div>
         <input type="text" placeholder="Введите Кличку" {...register("name", {required: true, maxLength: 20})} />

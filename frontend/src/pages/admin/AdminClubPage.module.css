@@ -1,0 +1,54 @@
+.container{
+    max-width: 1400px;
+    margin: auto;
+}
+
+.table{
+    margin-top: 8px;
+    max-width: 100%;
+    border: 2px solid rgb(255, 181, 167);
+    border-radius: 3px;
+    background: rgb(255, 255, 255);
+}
+.table table{
+    width:100%;
+    justify-content: center;
+    border-spacing: 0;
+}
+td{
+    border-top: 2px solid rgb(255, 181, 167);
+    padding: 5px;
+}
+.title{
+    background: rgba(249, 220, 196, 0.75);
+    height: 41px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 19px;
+    border-radius: 3px 3px 0px 0px;
+    
+}
+.title td{
+    border-top: 0px;
+    
+}
+.line{
+    height: 35px;
+    border: 2px solid rgb(255, 181, 167);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 17px;
+    text-align: center;
+}
+
+.check{   
+    text-align: center;
+}
+
+.card{
+    text-align: center;
+    color: rgb(0, 0, 0, 0.55);
+    cursor: pointer;
+    
+}

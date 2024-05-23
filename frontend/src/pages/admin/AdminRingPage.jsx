@@ -5,8 +5,9 @@ import { jwtDecode } from 'jwt-decode'
 import style from './AdminRingPage.module.css'
 import { useNavigate } from 'react-router-dom'
 import Checkbox from '../../components/Checkbox'
+import AddRing from '../../components/AddRing'
 const AdminRingPage = () => {
-    const navigate=useNavigate();
+    const navigate = useNavigate();
     useEffect(()=>{
         const token = localStorage.getItem('token');
         if(token){
@@ -27,6 +28,7 @@ const AdminRingPage = () => {
 export default AdminRingPage
 
 const RingPage =()=>{
+    const [overlay, setOverlay] = useState(false)
     const [rings, setRing] = useState([])
     useEffect(()=>{
         const fetchData = async () => {
@@ -51,19 +53,37 @@ const RingPage =()=>{
       }
     });
   };
+
+  const handleDelete=async (checkedItems)=>{
+    async function deleteData(id){
+        try{
+            await axios.delete(`http://localhost:8082/admin/delete_ring?id=${id}` )
+        }catch(error){
+            console.log(error)
+        }
+    }
+    if (checkedItems.length !== 0){
+        await Promise.all(checkedItems.map(id => deleteData(id)));
+        window.location.reload();
+    }
+
+    else{alert('Не выбран ринг для удаления')}
+
+  }
     return(
         <div className={style.container}>
+            {overlay?<AddRing /> : <></>}
             <div className={style.menu}>
-                <button className={style.add}>Создать новый ринг</button>
-                <button className={style.delete}>Удалить ринг</button>
+                <button className={style.add} onClick={()=>setOverlay(!overlay)}>Создать новый ринг</button>
+                <button className={style.delete} onClick={() => handleDelete(checkedItems)}>Удалить ринг</button>
             </div>
             <div className={style.table}>
                 <table>
                     <tr className={style.title}>
                         <td></td>
-                        <td>Название ринга</td>
+                        <td>Название ринга <img src='/triangle.svg' alt=''/></td>
                         <td>Адрес</td>
-                        <td>Специализация ринга</td>
+                        <td>Специализация ринга <img src='/triangle.svg' alt=''/></td>
                         <td>Эксперты ринга</td>
                         <td>Карточка ринга</td>
                     </tr>
@@ -75,13 +95,11 @@ const RingPage =()=>{
                 </td>
                 <td>{el.name}</td>
                 <td>{el.address}</td>
-                <td>{el.specialization}</td>
+                <td>{el.specialization.map(e=><>{e} </>)}</td>
                 <td>{el.experts}</td>
                 <td className={style.card}>Открыть карточку</td>
                 </tr>)}
                 </table>
-
-                {checkedItems}
             </div>
         </div>
     )

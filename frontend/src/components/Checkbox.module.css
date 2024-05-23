@@ -23,6 +23,7 @@
     background-color: rgb(254, 251, 251);
     border-radius: 3px;
     border: 1px solid rgb(255, 181, 167);
+    margin-top: -2px;
   }
   
   .checkbox_container input:checked ~ .custom_checkbox {

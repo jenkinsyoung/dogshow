@@ -8,9 +8,9 @@ const ContainerStyle ={
   padding: '0',
   top: '0',
   left: '0',
-  position: 'absolute',
+  position: 'fixed',
   width: '100%',
-  height: '100vh',
+  height: '100%',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
@@ -131,6 +131,9 @@ const EditDog = ({params}) => {
         console.error('Error converting images to Base64', error);
       });
   };
+  const handleImageRemove = (index) => {
+    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+  };
   const handleReload =()=>{
     window.location.reload()
   }
@@ -146,11 +149,32 @@ const EditDog = ({params}) => {
       {error && <p style={{ color: 'red', textAlign: 'center', marginTop: '-20px' }}>{error}</p>}
       <div>
         {images.map((image, index) => (
-          <img key={index} src={image} alt={`upload-${index}`} style={{ width: '50px', margin: '5px' }} />
+          <div key={index} style={{ position: 'relative', display: 'inline-block' }}>
+          <img src={image} alt={`Upload ${index}`} style={{ width: '50px', height: '100%' }} />
+          <button
+            onClick={() => handleImageRemove(index)}
+            style={{
+              position: 'absolute',
+              width: '18px',
+              height: '15px',
+              top: '-20px',
+              right: '1px',
+              backgroundColor: 'transparent',
+              color: 'red',
+              border: 'none',
+              textAlign: 'center',
+              alignItems: 'center',
+              borderRadius: '50%',
+              cursor: 'pointer',
+            }}
+          >
+            &times;
+          </button>
+        </div>
         ))}
       </div>
-        <input type="text" placeholder={`${dog.name}`} {...register("name", {required: true, maxLength: 20})} />
-        <input type='number' placeholder={`${dog.age}`} {...register("age", {required: true})} />
+        <input type="text" placeholder={`${dog.name}`} {...register("name", {maxLength: 20})} />
+        <input type='number' placeholder={`${dog.age}`} {...register("age")} />
       <Select
         styles={customStyles}
         value={selectedOption}
@@ -161,8 +185,19 @@ const EditDog = ({params}) => {
         noOptionsMessage={() => "Порода не найдена"}
       />
         <label style={{textAlign: 'left', color: 'rgb(98, 90, 87)', marginTop: '30px', fontSize: '18px'}}>Дата последней вакцинации:</label>
-        <input style ={{marginTop: '10px',}} type="date" placeholder={`${dog.vaccination}`} {...register("vaccination", {required: true})} />
-        
+        <input style ={{marginTop: '10px',}} type="date" placeholder={`${dog.vaccination}`} {...register("vaccination")} />
+        <div style={{display: 'flex', justifyContent: 'space-between' , width: '90%'}}>
+        <label style={{textAlign: 'left', color: 'rgb(98, 90, 87)', marginTop: '5px', fontSize: '18px'}}>Количество золотых наград:</label>
+        <input style={{width: '70px', marginBottom: '10px'}} type='number' placeholder={`${dog.gold_count}`} {...register("gold_count")} />
+        </div>
+        <div style={{display: 'flex', justifyContent: 'space-between' , width: '90%'}}>
+        <label style={{textAlign: 'left', color: 'rgb(98, 90, 87)', marginTop: '5px', fontSize: '18px'}}>Количество серебряных наград:</label>
+        <input style={{width: '70px', marginBottom: '10px'}} type='number' placeholder={`${dog.silver_count}`} {...register("silver_count")} />
+        </div>
+        <div style={{display: 'flex', justifyContent: 'space-between' , width: '90%'}}>
+        <label style={{textAlign: 'left', color: 'rgb(98, 90, 87)', marginTop: '5px', fontSize: '18px'}}>Количество бронзовых наград:</label>
+        <input style={{width: '70px', marginBottom: '10px'}} type='number' placeholder={`${dog.bronze_count}`} {...register("bronze_count")} />
+        </div>
         <button type="submit">Изменить</button>
         <button onClick={handleReload}>Отменить</button>
         </form>

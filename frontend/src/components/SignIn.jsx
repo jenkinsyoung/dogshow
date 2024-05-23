@@ -29,7 +29,6 @@ const SignIn = () => {
         setLoggedIn(true);
         if(role_id === '2') navigate('/home')
         else if(role_id === '3') navigate('/expert')
-        else if(role_id === '4') navigate('/club')
         else navigate('/admin')
       }
       else {setError('Неверное имя пользователя или пароль');}}
@@ -109,7 +108,6 @@ const SignIn = () => {
           <option value="0">Выберите роль</option>
           <option style ={{color: 'rgb(98, 90, 87)'}}value="2">Хозяин собаки</option>
           <option style ={{color: 'rgb(98, 90, 87)'}}value="3">Эксперт</option>
-          <option style ={{color: 'rgb(98, 90, 87)'}}value="4">Председатель клуба</option>
         </select>
         <input type="text" placeholder="Введите логин" {...register("login", {required: true})} />
         <input type="password" placeholder="Введите пароль" {...register("password", {required: true, minLength: 6, pattern: /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/})} />

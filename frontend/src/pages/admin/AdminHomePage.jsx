@@ -1,6 +1,5 @@
 import React, {useEffect, useState, createRef} from 'react'
 import style from './AdminHomePage.module.css';
-import Podium from '../../components/Podium';
 import { getTodayDate } from '../../utils/time';
 import Countdown from '../../components/Timer';
 import HeaderAdmin from '../../components/HeaderAdmin';
@@ -75,12 +74,8 @@ const Home = () => {
     <input type="hidden" min="0" max="100" value={value} onChange={(e) => setValue(parseInt(e.target.value))} />
     <SwiperCoverflow />
      <div>
-     <img src="/line.svg" alt="" className={style.line} style={{marginTop: '20px'}} />
      </div>
-     <div className={style.rewards}>
-        <h1>Наши победители</h1>
-        <Podium />
-     </div>
+
     </>
  )
 }

@@ -102,7 +102,6 @@ const AdminParticipant =() =>{
                         <td>Порода <img src='/triangle.svg' alt=''/></td>
                         <td>Возраст</td>
                         <td>ФИО хозяина <img src='/triangle.svg' alt=''/></td>
-                        <td>Клуб <img src='/triangle.svg' alt=''/></td>
                         <td>Ринг <img src='/triangle.svg' alt=''/></td>
                         <td>Кол-во наград <img src='/triangle.svg' alt=''/></td>
                         <td>Статус заявки <img src='/triangle.svg' alt=''/></td>
@@ -118,7 +117,6 @@ const AdminParticipant =() =>{
                 <td>{el.breed}</td>
                 <td>{el.age}</td>
                 <td>{el.fio}</td>
-                <td>{el.club}</td>
                 <td>{el.ring}</td>
                 <td>{el.reward_cnt}</td>
                 <td>{el.status}</td>

@@ -17,9 +17,6 @@ const HeaderAdmin = () => {
                         <Link to="/admin/participants">Участники</Link>
                     </li>
                     <li>
-                        <Link to="/admin/clubs">Клубы</Link>
-                    </li>
-                    <li>
                         <Link to="/admin/rings">Ринги</Link>
                     </li>
                     <li>

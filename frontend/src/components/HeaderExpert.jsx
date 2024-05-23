@@ -14,13 +14,10 @@ const HeaderExpert = () => {
              
             <nav className={style.navbar}>
                     <li>
-                        <Link to="/expert/pets">Участники</Link>
+                        <Link to="/expert/participants">Участники</Link>
                     </li>
                     <li>
-                        <Link to="/expert/clubs">Клубы</Link>
-                    </li>
-                    <li>
-                        <Link to="expert/rings">Ринги</Link>
+                        <Link to="/expert/rings">Ринги</Link>
                     </li>
             </nav>
             <Link to="/expert/profile"><img className={style.profile} src='/profile.svg' alt=''/></Link>

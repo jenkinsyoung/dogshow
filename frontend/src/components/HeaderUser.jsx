@@ -19,9 +19,6 @@ const HeaderUser = () => {
                         <Link to="/home/pets">Мои питомцы</Link>
                     </li>
                     <li>
-                        <Link to="/home/clubs">Клубы</Link>
-                    </li>
-                    <li>
                         <Link to="/rings">Ринги</Link>
                     </li>
                     <li>

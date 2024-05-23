@@ -81,7 +81,7 @@ app.get('/dogs', async(req, res) =>{
 
     // Подготавливаем SQL-запрос с параметрами
     const query = {
-      text: `SELECT dog.id, dog.name, dog.age, breed.name AS breed, club.name AS club, 
+      text: `SELECT dog.id, dog.name, dog.age, breed.name AS breed, 
       vaccination, ARRAY_AGG(DISTINCT ring.name) AS rings, criterion.name AS criteria, 
       mark.value, COALESCE(reward_counts.gold_count, 0) AS gold_count,
       COALESCE(reward_counts.silver_count, 0) AS silver_count,
@@ -95,18 +95,17 @@ app.get('/dogs', async(req, res) =>{
   LEFT JOIN "dog_reward" ON dog.id = dog_reward.dog_id
   LEFT JOIN "mark" ON mark.dog_id = dog.id
   LEFT JOIN "criterion" ON mark.criterion_id = criterion.id
-  LEFT JOIN "club" ON club.id = dog.club_id
   LEFT JOIN (
       SELECT 
           dog_id,
-          SUM(CASE WHEN reward_id = 1 THEN 1 ELSE 0 END) AS gold_count,
-          SUM(CASE WHEN reward_id = 2 THEN 1 ELSE 0 END) AS silver_count,
-          SUM(CASE WHEN reward_id = 3 THEN 1 ELSE 0 END) AS bronze_count
+          SUM(CASE WHEN reward_id = 1 THEN count ELSE 0 END) AS gold_count,
+          SUM(CASE WHEN reward_id = 2 THEN count ELSE 0 END) AS silver_count,
+          SUM(CASE WHEN reward_id = 3 THEN count ELSE 0 END) AS bronze_count
       FROM "dog_reward"
       GROUP BY dog_id
   ) AS reward_counts ON dog.id = reward_counts.dog_id
   WHERE user_id = $1 
-  GROUP BY dog.id, dog.name, dog.age, breed.name, club.name, vaccination, criterion_id, mark.value, criteria, gold_count, silver_count, bronze_count;`,
+  GROUP BY dog.id, dog.name, dog.age, breed.name, vaccination, criterion_id, mark.value, criteria, gold_count, silver_count, bronze_count;`,
       values: [searchId],
     };
     const result = await pool.query(query);
@@ -324,14 +323,13 @@ app.get('/admin/participants', async(req, res) =>{
     const query={
       text: `SELECT application.id, dog.name AS nickname, breed.name AS breed, dog.age,
       CONCAT(u.surname, ' ', SUBSTRING(u.name, 1, 1), '. ', SUBSTRING(u.patronymic, 1, 1), '.') AS fio,
-      club.name AS club, ring.name AS ring, COUNT(dog_reward.reward_id) AS reward_cnt, application.status FROM "application"
+      ring.name AS ring, COUNT(dog_reward.reward_id) AS reward_cnt, application.status FROM "application"
       LEFT JOIN "dog" ON dog.id = application.dog_id
       LEFT JOIN "breed" ON breed.id = dog.breed_id
       LEFT JOIN "user" u ON u.id = dog.user_id
       LEFT JOIN "ring" ON ring.id = application.ring_id
-      LEFT JOIN "club" ON club.id = dog.club_id
       FULL JOIN "dog_reward" ON dog.id = dog_reward.dog_id
-      GROUP BY application.id, nickname, breed, dog.age, fio, club, ring, application.status`
+      GROUP BY application.id, nickname, breed, dog.age, fio, ring, application.status`
     }
     const result = await pool.query(query);
     res.json(result.rows);

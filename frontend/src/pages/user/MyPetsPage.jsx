@@ -93,7 +93,7 @@ const Pets =() =>{
             </div>
         
             <div>
-                <button className={style.join}>Подать завку на участие</button>
+                <button className={style.join} onClick={()=>{}}>Подать завку на участие</button>
                 <button className={style.delete} onClick={()=>handleDelete(checkedItems)}>Удалить</button>
             </div>
             

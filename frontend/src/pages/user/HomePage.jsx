@@ -2,7 +2,6 @@ import React, {useEffect, useState, createRef} from 'react'
 import style from './HomePage.module.css';
 import HeaderUser from '../../components/HeaderUser';
 import Slider from '../../components/Slider';
-import Podium from '../../components/Podium';
 import { getTodayDate } from '../../utils/time';
 import Countdown from '../../components/Timer';
 import { useNavigate } from 'react-router-dom';
@@ -77,11 +76,6 @@ const Home = () => {
     <input type="hidden" min="0" max="100" value={value} onChange={(e) => setValue(parseInt(e.target.value))} />
      <div>
      <Slider />
-     <img src="/line.svg" alt="" className={style.line} />
-     </div>
-     <div className={style.rewards}>
-        <h1>Наши победители</h1>
-        <Podium />
      </div>
     </>
  )

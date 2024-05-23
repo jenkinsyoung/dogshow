@@ -37,10 +37,6 @@ const Dog = ({dog}) => {
                     дата вакцинации:
                     <span>{dog.vaccination.split('T')[0]}</span>
                 </div>
-                <div className={style.criterion}>
-                    клуб:
-                    <span>{dog.club}</span>
-                </div>
             </div>
             <div className={style.rewards}>
             <p className={style.title}>Награды</p>

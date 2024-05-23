@@ -101,7 +101,6 @@ const AdminExpert =()=>{
                         <td></td>
                         <td>ФИО эксперта <img src='/triangle.svg' alt=''/></td>
                         <td>Специализация <img src='/triangle.svg' alt=''/></td>
-                        <td>Клуб</td>
                         <td>Ринг <img src='/triangle.svg' alt=''/></td>
                         <td>Статус заявки <img src='/triangle.svg' alt=''/></td>
                         <td>Карточка</td>
@@ -114,7 +113,6 @@ const AdminExpert =()=>{
                 </td>
                 <td>{el.fio}</td>
                 <td>{el.breed}</td>
-                <td>{el.club}</td>
                 <td>{el.ring}</td>
                 <td>{el.status}</td>
                 <td className={style.card}>Открыть карточку</td>

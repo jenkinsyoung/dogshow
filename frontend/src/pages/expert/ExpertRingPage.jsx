@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from 'react'
-import HeaderAdmin from '../../components/HeaderAdmin'
 import axios from 'axios'
 import { jwtDecode } from 'jwt-decode'
-import style from './AdminRingPage.module.css'
+import style from './ExpertRingPage.module.css'
 import { useNavigate } from 'react-router-dom'
 import Checkbox from '../../components/Checkbox'
-import AddRing from '../../components/AddRing'
-const AdminRingPage = () => {
+import HeaderExpert from '../../components/HeaderExpert'
+const ExpertRingPage = () => {
     const navigate = useNavigate();
     useEffect(()=>{
         const token = localStorage.getItem('token');
         if(token){
             const decodedToken = jwtDecode(token);
-            if(decodedToken.role_id !== "1") navigate("/forbidden");
+            if(decodedToken.role_id !== "3") navigate("/forbidden");
         }
     })
   return (
     <div className='page'>
-        <HeaderAdmin />
+        <HeaderExpert />
         <main>
             <RingPage />
         </main>
@@ -25,15 +24,14 @@ const AdminRingPage = () => {
   )
 }
 
-export default AdminRingPage
+export default ExpertRingPage
 
 const RingPage =()=>{
-    const [overlay, setOverlay] = useState(false)
     const [rings, setRing] = useState([])
     useEffect(()=>{
         const fetchData = async () => {
             try {
-                const data = await axios.get(`http://localhost:8082/admin/rings`);
+                const data = await axios.get(`http://localhost:8082/expert/rings`);
                 setRing(data.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -53,29 +51,29 @@ const RingPage =()=>{
       }
     });
   };
-
-  const handleDelete=async (checkedItems)=>{
-    async function deleteData(id){
+  const [ringId, setRingId] = useState('')
+  const handleJoin= async (checkedItems)=>{
+    if (checkedItems.length > 1) {alert('Выберите только один ринг')}
+    else if (checkedItems.length === 0){alert('Не выбран ринг')}
+    else{
+        setRingId(checkedItems[0])
+        const token = localStorage.getItem('token');
+        const decodedToken = jwtDecode(token);
+        const expert_id = decodedToken.userId;
+        console.log(expert_id, ringId)
         try{
-            await axios.delete(`http://localhost:8082/admin/delete_ring?id=${id}` )
+            await axios.post(`http://localhost:8082/expert/new_application?expert_id=${expert_id}&ring_id=${ringId}`)
+            window.location.reload();
         }catch(error){
             console.log(error)
         }
     }
-    if (checkedItems.length !== 0){
-        await Promise.all(checkedItems.map(id => deleteData(id)));
-        window.location.reload();
-    }
-
-    else{alert('Не выбран ринг для удаления')}
-
-  }
+};
+ 
     return(
         <div className={style.container}>
-            {overlay?<AddRing /> : <></>}
             <div className={style.menu}>
-                <button className={style.add} onClick={()=>setOverlay(!overlay)}>Создать новый ринг</button>
-                <button className={style.delete} onClick={() => handleDelete(checkedItems)}>Удалить ринг</button>
+                <button className={style.add} onClick={()=>{handleJoin(checkedItems)}}>Подать заявку</button>
             </div>
             <div className={style.table}>
                 <table>
@@ -84,8 +82,6 @@ const RingPage =()=>{
                         <td>Название ринга <img src='/triangle.svg' alt=''/></td>
                         <td>Адрес</td>
                         <td>Специализация ринга <img src='/triangle.svg' alt=''/></td>
-                        <td>Эксперты ринга</td>
-                        <td>Карточка ринга</td>
                     </tr>
             {rings.map(el=><tr className={style.line} key={el.id}> 
                 <td className={style.check}>
@@ -96,8 +92,6 @@ const RingPage =()=>{
                 <td>{el.name}</td>
                 <td>{el.address}</td>
                 <td>{el.specialization.map(e=><div style={{display: 'flex'}}><span style={{color: 'rgb(255, 181, 167)'}}>◆</span> {e} </div>)}</td>
-                <td>{el.experts[0] !== '  ' ? el.experts.map(e=><div style={{display: 'flex'}}><span style={{color: 'rgb(255, 181, 167)'}}>◆</span> {e} </div>): <></>}</td>
-                <td className={style.card}>Открыть карточку</td>
                 </tr>)}
                 </table>
             </div>

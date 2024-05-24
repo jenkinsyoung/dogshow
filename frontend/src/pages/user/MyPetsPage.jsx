@@ -7,6 +7,7 @@ import Dog from '../../components/Dog'
 import AddDog from '../../components/AddDog'
 import { useNavigate } from 'react-router-dom'
 import Checkbox from '../../components/Checkbox'
+import JoinUser from '../../components/JoinUser'
 
 const MyPetsPage = () => {
     const navigate=useNavigate();
@@ -44,7 +45,7 @@ const Pets =() =>{
     useEffect(()=>{
         const fetchData = async () => {
             try {
-                const data = await axios.get(`http://localhost:8082/dogs?userId=${userId}` );
+                const data = await axios.get(`http://localhost:8082/dogs?userId=${userId}`);
                 setDogs(data.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -69,23 +70,35 @@ const Pets =() =>{
           }
         });
       };
-      const handleDelete=async (checkedItems)=>{
-        async function deleteData(id){
-            try{
-                await axios.delete(`http://localhost:8082/delete_dog?id=${id}` )
-            }catch(error){
-                console.log(error)
-            }
+    const handleDelete=async (checkedItems)=>{
+    async function deleteData(id){
+        try{
+            await axios.delete(`http://localhost:8082/delete_dog?id=${id}` )
+        }catch(error){
+            console.log(error)
         }
-        if (checkedItems.length !== 0){
-            await Promise.all(checkedItems.map(id => deleteData(id)));
-            window.location.reload();
+    }
+    if (checkedItems.length !== 0){
+        await Promise.all(checkedItems.map(id => deleteData(id)));
+        window.location.reload();
+    }
+    else{alert('Не выбран питомец')}
+    };
+
+    const[overlayJoin, setJoinOverlay] = useState(false)
+    const [dogId, setDogId] = useState('')
+    const handleJoin= (checkedItems)=>{
+        if (checkedItems.length > 1) {alert('Выберите только одного питомца')}
+        else if (checkedItems.length === 0){alert('Не выбран питомец')}
+        else{
+            setJoinOverlay(true);
+            setDogId(checkedItems[0])
         }
-        else{alert('Не выбран питомец')}
-      };
+    };
     return(
         <div className={style.container}>
         {overlay? <AddDog params={userId}/> : <></>}
+        {overlayJoin? <JoinUser params={dogId} />: <></>}
         <div className={style.menu_btn}>
             <div>
                 <button className={style.add} onClick={handleAdd}>Добавить питомца</button>
@@ -93,7 +106,7 @@ const Pets =() =>{
             </div>
         
             <div>
-                <button className={style.join} onClick={()=>{}}>Подать завку на участие</button>
+                <button className={style.join} onClick={()=>{handleJoin(checkedItems)}}>Подать завку на участие</button>
                 <button className={style.delete} onClick={()=>handleDelete(checkedItems)}>Удалить</button>
             </div>
             

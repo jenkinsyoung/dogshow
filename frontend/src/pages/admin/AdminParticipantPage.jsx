@@ -5,6 +5,7 @@ import HeaderAdmin from '../../components/HeaderAdmin';
 import axios from 'axios'
 import style from './AdminParticipantPage.module.css'
 import Checkbox from '../../components/Checkbox'
+import AddParticipant from '../../components/AddParticipant';
 const AdminParticipantPage = () => {
     const navigate=useNavigate();
     useEffect(()=>{
@@ -86,7 +87,7 @@ const AdminParticipant =() =>{
   }
     return(
         <div className={style.container}>
-            {/* {overlay?<AddParticipant /> : <></>} */}
+            {overlay?<AddParticipant /> : <></>}
             <div className={style.btn}>
             <button className={style.participant} onClick={()=>setOverlay(!overlay)}>Добавить нового участника</button>
             <div className={style.menu}>
@@ -103,9 +104,9 @@ const AdminParticipant =() =>{
                         <td>Возраст</td>
                         <td>ФИО хозяина <img src='/triangle.svg' alt=''/></td>
                         <td>Ринг <img src='/triangle.svg' alt=''/></td>
+                        <td>Специализация ринга</td>
                         <td>Кол-во наград <img src='/triangle.svg' alt=''/></td>
                         <td>Статус заявки <img src='/triangle.svg' alt=''/></td>
-                        <td>Карточка</td>
                     </tr>
             {participants.map(el=><tr className={style.line} key={el.id}> 
                 <td className={style.check}>
@@ -118,9 +119,9 @@ const AdminParticipant =() =>{
                 <td>{el.age}</td>
                 <td>{el.fio}</td>
                 <td>{el.ring}</td>
+                <td>{el.specialization.map(e=><div style={{display: 'flex'}}><span style={{color: 'rgb(255, 181, 167)'}}>◆</span> {e} </div>)}</td>
                 <td>{el.reward_cnt}</td>
                 <td>{el.status}</td>
-                <td className={style.card}>Открыть карточку</td>
                 </tr>)}
                 </table>
             </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import style from './Header.module.css';
 const HeaderExpert = () => {
     const navigate = useNavigate()
@@ -10,19 +10,33 @@ const HeaderExpert = () => {
   return (
     <header>
 
-                <Link to="/expert"><img className={style.image} src='/logo.png' alt=''/></Link>
+        <NavLink to="/expert">
+            <img className={style.image} src='/logo.png' alt=''/>
+        </NavLink>
              
-            <nav className={style.navbar}>
-                    <li>
-                        <Link to="/expert/participants">Участники</Link>
-                    </li>
-                    <li>
-                        <Link to="/expert/rings">Ринги</Link>
-                    </li>
-            </nav>
-            <Link to="/expert/profile"><img className={style.profile} src='/profile.svg' alt=''/></Link>
-            <img className={style.out} onClick={logout} src='/logout.svg' alt=''/>
-        </header>
+        <nav className={style.navbar}>
+            <li>
+                <NavLink 
+                    to="/expert/participants" 
+                    className={({ isActive }) => isActive ? style.activeLink : undefined}
+                >
+                    Участники
+                </NavLink>
+            </li>
+            <li>
+                <NavLink 
+                    to="/expert/rings" 
+                    className={({ isActive }) => isActive ? style.activeLink : undefined}
+                >
+                    Ринги
+                </NavLink>
+            </li>
+        </nav>
+        <NavLink to="/profile">
+                <img className={style.profile} src='/profile.svg' alt=''/>
+        </NavLink>
+        <img className={style.out} onClick={logout} src='/logout.svg' alt=''/>
+    </header>
   )
 }
 

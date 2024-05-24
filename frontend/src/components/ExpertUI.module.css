@@ -1,0 +1,54 @@
+.card{
+    width: 320px;
+    height: 433px;
+    box-sizing: border-box;
+    border: 2px solid rgb(255, 181, 167);
+    border-radius: 3px;
+    background: rgba(251, 229, 211, 0.83);
+}
+
+.content{
+    width: 282px;
+    margin:auto;
+    height: 100%;
+}
+
+.photo{
+    width: 282px;
+    height: 282px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    border-radius: 3px;
+    border: none;
+}
+
+.name{
+    width: 282px;
+    height: 51px;
+    color: rgba(6, 5, 7, 0.76);
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: 0px;
+    text-align: center;
+    margin: 4px 0px;
+}
+
+.specialization{
+    width: 282px;
+    height: 42px;
+    display: flex;
+}
+.specialization p{
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 19px;
+    color: rgb(129, 119, 115);
+}
+.specialization span{
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 19px;
+    color: rgba(6, 5, 7, 0.76);
+}

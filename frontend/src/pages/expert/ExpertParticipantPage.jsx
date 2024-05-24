@@ -47,7 +47,7 @@ const ExpertParticipant =()=>{
 
     return(
         <div className={style.container}>
-            {/* {overlay?<AddParticipant /> : <></>} */}
+            {/* {overlay?<AddMark /> : <></>} */}
             <div className={style.table}>
                 <table>
                     <tr className={style.title}>
@@ -55,6 +55,7 @@ const ExpertParticipant =()=>{
                         <td>Порода <img src='/triangle.svg' alt=''/></td>
                         <td>Возраст</td>
                         <td>ФИО хозяина <img src='/triangle.svg' alt=''/></td>
+                        <td>Ринг</td>
                         <td>Карточка</td>
                     </tr>
             {participants.map(el=><tr className={style.line} key={el.id}> 
@@ -62,6 +63,7 @@ const ExpertParticipant =()=>{
                 <td>{el.breed}</td>
                 <td>{el.age}</td>
                 <td>{el.fio}</td>
+                <td>{el.ring}</td>
                 <td className={style.card}>Открыть карточку</td>
                 </tr>)}
                 </table>

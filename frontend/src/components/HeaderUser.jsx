@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import style from './Header.module.css';
 const HeaderUser = () => {
     const navigate = useNavigate()
@@ -10,24 +10,41 @@ const HeaderUser = () => {
   return (
     <header>
 
-                <Link to="/home"><img className={style.image} src='/logo.png' alt=''/></Link>
+        <NavLink to="/home">
+            <img className={style.image} src='/logo.png' alt=''/>
+        </NavLink>
              
-            <nav className={style.navbar}>
-                    
-                    {/* <div>BarkFest</div> */}
-                    <li>
-                        <Link to="/home/pets">Мои питомцы</Link>
-                    </li>
-                    <li>
-                        <Link to="/rings">Ринги</Link>
-                    </li>
-                    <li>
-                        <Link to="/experts">Эксперты</Link>
-                    </li>
-            </nav>
-            <Link to="/profile"><img className={style.profile} src='/profile.svg' alt=''/></Link>
-            <img className={style.out} onClick={logout} src='/logout.svg' alt=''/>
-        </header>
+        <nav className={style.navbar}>
+                <li>
+                    <NavLink 
+                        to="/home/pets" 
+                        className={({ isActive }) => isActive ? style.activeLink : undefined}
+                    >
+                        Мои питомцы
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink 
+                        to="/home/rings" 
+                        className={({ isActive }) => isActive ? style.activeLink : undefined}
+                    >
+                        Ринги
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink 
+                        to="/home/experts" 
+                        className={({ isActive }) => isActive ? style.activeLink : undefined}
+                    >
+                        Эксперты
+                    </NavLink>
+                </li>
+        </nav>
+        <NavLink to="/profile">
+                <img className={style.profile} src='/profile.svg' alt=''/>
+        </NavLink>
+        <img className={style.out} onClick={logout} src='/logout.svg' alt=''/>
+    </header>
   )
 }
 

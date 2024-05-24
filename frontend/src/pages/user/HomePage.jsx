@@ -28,6 +28,7 @@ const HomePage = () => {
 export default HomePage
 
 const Home = () => {
+    const navigate = useNavigate();
     const todayDate = getTodayDate();
     const [value, setValue] = useState(0); // Используем state для хранения значения input
     const pieChartRef = createRef(); // Создаем ref для доступа к элементу .pie-chart
@@ -59,7 +60,7 @@ const Home = () => {
             <div className={style.timer}><Countdown/></div>
             <div className={`${style.info}  && ${style.in}`}>Дата начала выставки: <span>15.06.2024</span></div>
             <div className={`${style.info}  && ${style.in}`}>Количество рингов: <span>20</span></div>
-            <button>Принять участие</button>
+            <button onClick={()=>navigate('/home/pets')}>Принять участие</button>
 
         </div>
         <div className={style.third}>

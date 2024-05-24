@@ -56,9 +56,9 @@ const Dog = ({dog}) => {
             <div className={style.ring}>
             <p className={style.title}>О текущем участии</p>
                 <div className={style.criterion}>
-                    Ринг:
-                    {dog.rings.map(ring=><span>{ring}</span>)}
+                    Ринги:
                 </div>
+                    {dog.rings[0] !== null ? dog.rings.map(el=><span>◆ {el.ring} -- {el.status}</span>): (<></>)}
             </div>
         <div className={style.marks}>
         {dog.marks.length > 0 ? <p className={style.title}>Оценки</p>: <></>}

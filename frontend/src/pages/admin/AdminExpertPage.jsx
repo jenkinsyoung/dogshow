@@ -5,6 +5,7 @@ import HeaderAdmin from '../../components/HeaderAdmin';
 import axios from 'axios'
 import style from './AdminExpertPage.module.css'
 import Checkbox from '../../components/Checkbox'
+import AddExpert from '../../components/AddExpert';
 
 const AdminExpertPage =() =>{
     const navigate=useNavigate();
@@ -87,7 +88,7 @@ const AdminExpert =()=>{
   }
     return(
         <div className={style.container}>
-            {/* {overlay?<AddParticipant /> : <></>} */}
+            {overlay?<AddExpert /> : <></>}
             <div className={style.btn}>
             <button className={style.participant} onClick={()=>setOverlay(!overlay)}>Добавить нового эксперта</button>
             <div className={style.menu}>
@@ -99,11 +100,11 @@ const AdminExpert =()=>{
                 <table>
                     <tr className={style.title}>
                         <td></td>
-                        <td>ФИО эксперта <img src='/triangle.svg' alt=''/></td>
-                        <td>Специализация <img src='/triangle.svg' alt=''/></td>
-                        <td>Ринг <img src='/triangle.svg' alt=''/></td>
+                        <td>ФИО эксперта</td>
+                        <td>Специализация эксперта</td>
+                        <td>Ринг</td>
+                        <td>Специализация ринга</td>
                         <td>Статус заявки <img src='/triangle.svg' alt=''/></td>
-                        <td>Карточка</td>
                     </tr>
             {experts.map(el=><tr className={style.line} key={el.id}> 
                 <td className={style.check}>
@@ -112,12 +113,13 @@ const AdminExpert =()=>{
                         onChange={handleCheckBoxChange}/>
                 </td>
                 <td>{el.fio}</td>
-                <td>{el.breed}</td>
+                <td>{el.expert_specialization}</td>
                 <td>{el.ring}</td>
+                <td>{el.ring_specialization.map(e=><div style={{display: 'flex'}}><span style={{color: 'rgb(255, 181, 167)'}}>◆</span> {e} </div>)}</td>
                 <td>{el.status}</td>
-                <td className={style.card}>Открыть карточку</td>
                 </tr>)}
                 </table>
+                {checkedItems}
             </div>
         </div>
     )

@@ -64,6 +64,9 @@ app.post('/register', async (req, res) =>{
   
     // Добавляем нового пользователя в базу данных
     const newUser = await pool.query('INSERT INTO "user" (id, name, surname, patronymic, login, password, role_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *', [id, name, surname, patronymic, login, password, parseInt(role_id)]);
+    if (role_id === '3') {
+      await pool.query('INSERT INTO "expert" (user_id) VALUES ($1)', [newUser.rows[0].id]);
+    }
     const token = generateToken(newUser.rows[0]);
     res.status(201).json({token});
   } catch (error) {
@@ -79,39 +82,37 @@ app.get('/dogs', async(req, res) =>{
   try{
     const searchId = parseInt(ownerId);
 
-    // Подготавливаем SQL-запрос с параметрами
     const query = {
       text: `SELECT dog.id, dog.name, dog.age, breed.name AS breed, 
-      vaccination, ARRAY_AGG(DISTINCT ring.name) AS rings, criterion.name AS criteria, 
-      mark.value, COALESCE(reward_counts.gold_count, 0) AS gold_count,
+      vaccination, ring.name AS ring, application.status AS application_status, 
+      criterion.name AS criteria, mark.value, 
+      COALESCE(reward_counts.gold_count, 0) AS gold_count,
       COALESCE(reward_counts.silver_count, 0) AS silver_count,
       COALESCE(reward_counts.bronze_count, 0) AS bronze_count,
       ARRAY_AGG(DISTINCT photo.image) AS images
-  FROM "dog"
-  LEFT JOIN "photo" ON dog.id = photo.dog_id  
-  LEFT JOIN "breed" ON breed.id = dog.breed_id
-  LEFT JOIN "application" ON application.dog_id = dog.id
-  LEFT JOIN "ring" ON application.ring_id = ring.id
-  LEFT JOIN "dog_reward" ON dog.id = dog_reward.dog_id
-  LEFT JOIN "mark" ON mark.dog_id = dog.id
-  LEFT JOIN "criterion" ON mark.criterion_id = criterion.id
-  LEFT JOIN (
-      SELECT 
-          dog_id,
-          SUM(CASE WHEN reward_id = 1 THEN count ELSE 0 END) AS gold_count,
-          SUM(CASE WHEN reward_id = 2 THEN count ELSE 0 END) AS silver_count,
-          SUM(CASE WHEN reward_id = 3 THEN count ELSE 0 END) AS bronze_count
-      FROM "dog_reward"
-      GROUP BY dog_id
-  ) AS reward_counts ON dog.id = reward_counts.dog_id
-  WHERE user_id = $1 
-  GROUP BY dog.id, dog.name, dog.age, breed.name, vaccination, criterion_id, mark.value, criteria, gold_count, silver_count, bronze_count;`,
+    FROM "dog"
+    LEFT JOIN "photo" ON dog.id = photo.dog_id  
+    LEFT JOIN "breed" ON breed.id = dog.breed_id
+    LEFT JOIN "application" ON application.dog_id = dog.id
+    LEFT JOIN "ring" ON application.ring_id = ring.id
+    LEFT JOIN "dog_reward" ON dog.id = dog_reward.dog_id
+    LEFT JOIN "mark" ON mark.dog_id = dog.id
+    LEFT JOIN "criterion" ON mark.criterion_id = criterion.id
+    LEFT JOIN (
+        SELECT 
+            dog_id,
+            SUM(CASE WHEN reward_id = 1 THEN count ELSE 0 END) AS gold_count,
+            SUM(CASE WHEN reward_id = 2 THEN count ELSE 0 END) AS silver_count,
+            SUM(CASE WHEN reward_id = 3 THEN count ELSE 0 END) AS bronze_count
+        FROM "dog_reward"
+        GROUP BY dog_id
+    ) AS reward_counts ON dog.id = reward_counts.dog_id
+    WHERE dog.user_id = $1 
+    GROUP BY dog.id, dog.name, dog.age, breed.name, vaccination, ring.name, application.status, criterion.name, mark.value, gold_count, silver_count, bronze_count;`,
       values: [searchId],
     };
     const result = await pool.query(query);
     const rows = result.rows;
-
-    // Обработка данных для группировки marks
     const dogs = {};
 
     rows.forEach(row => {
@@ -123,7 +124,7 @@ app.get('/dogs', async(req, res) =>{
           breed: row.breed,
           club: row.club,
           vaccination: row.vaccination,
-          rings: row.rings,
+          rings: [],
           gold_count: row.gold_count,
           silver_count: row.silver_count,
           bronze_count: row.bronze_count,
@@ -138,9 +139,14 @@ app.get('/dogs', async(req, res) =>{
           value: row.value
         });
       }
+      if (row.ring && row.application_status) {
+        dogs[row.id].rings.push({
+          ring: row.ring,
+          status: row.application_status
+        });
+      }
     });
-
-    // Преобразование объекта в массив
+  
     const data = Object.values(dogs);
 
     res.json(data);
@@ -235,6 +241,43 @@ app.put('/edit_dog', async (req, res) => {
   }
 })
 
+app.post('/new_application', async(req, res) =>{
+  const {dog_id, ring_id} = req.body
+  try{
+    const existingApplication = await pool.query('SELECT * FROM "application" WHERE dog_id = $1 AND ring_id = $2', [parseInt(dog_id), parseInt(ring_id)]);
+    if (existingApplication.rows.length > 0) {
+      return res.status(400).json({ error: 'Application already exists' });
+    }
+    const query={
+      text: `INSERT INTO "application" (dog_id, ring_id) VALUES ($1, $2);`,
+      values: [parseInt(dog_id), parseInt(ring_id)]
+    }
+    await pool.query(query);
+    res.status(201).json({message: 'Application created successfully'});
+  }catch(error){
+    console.error('Error registering application:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+
+app.delete('/delete_application')
+
+app.get('/experts', async(req, res) =>{
+  try{
+    const query={
+      text: `SELECT CONCAT(u.surname, ' ', u.name, ' ', u.patronymic) AS fio,
+      u.image AS image, breed.name AS breed, u.email AS email
+      FROM "expert"
+      LEFT JOIN "user" u ON expert.user_id = u.id
+      LEFT JOIN "breed" ON breed.id = expert.breed_id;`
+    }
+    const result = await pool.query(query);
+    res.status(200).json(result.rows);
+  }catch(error){
+    console.error('Error searching in database:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
 
 // Маршруты для администратора
 
@@ -242,13 +285,13 @@ app.get('/admin/rings', async(req, res)=>{
   try{
     const query={
       text: `SELECT ring.id, ring.name, ring.address, ARRAY_AGG(breed.name) as specialization, 
-      ARRAY_AGG(CONCAT(u.surname, ' ', SUBSTRING(u.name, 1, 1), ' ', SUBSTRING(u.patronymic, 1, 1))) as experts FROM "ring"
-      FULL JOIN "ring_breed" ON ring.id = ring_breed.ring_id
+      ARRAY_AGG(DISTINCT CONCAT(u.surname, ' ', SUBSTRING(u.name, 1, 1), ' ', SUBSTRING(u.patronymic, 1, 1))) as experts FROM "ring"
+      LEFT JOIN "ring_breed" ON ring.id = ring_breed.ring_id
       LEFT JOIN "breed" ON breed.id = ring_breed.breed_id
-      FULL JOIN "expert_ring" ON ring.id = expert_ring.ring_id AND expert_ring.status = 'Одобрено'
+      LEFT JOIN "expert_ring" ON ring.id = expert_ring.ring_id AND expert_ring.status = 'Одобрено'
       LEFT JOIN "expert" ON expert.id = expert_ring.expert_id
       LEFT JOIN "user" u ON u.id = expert.user_id
-      GROUP BY ring.id, ring.name, ring.address`
+      GROUP BY ring.id, ring.name, ring.address;`
     }
     const result = await pool.query(query);
     res.json(result.rows);
@@ -302,6 +345,18 @@ app.delete('/admin/delete_ring', async(req, res)=>{
     };
     await pool.query(deleteBreedRingQuery);
 
+    const deleteExpertRingQuery = {
+      text: `DELETE FROM "expert_ring" WHERE ring_id = $1`,
+      values: [ringId]
+    };
+    await pool.query(deleteExpertRingQuery);
+
+    const deleteApplicationQuery = {
+      text: `DELETE FROM "application" WHERE ring_id = $1`,
+      values: [ringId]
+    };
+    await pool.query(deleteApplicationQuery);
+
     const deleteRingQuery = {
       text: `DELETE FROM "ring" WHERE id = $1`,
       values: [ringId]
@@ -318,18 +373,30 @@ app.delete('/admin/delete_ring', async(req, res)=>{
   }
 })
 
+app.put('/admin/edit_ring')
+
 app.get('/admin/participants', async(req, res) =>{
   try{
     const query={
-      text: `SELECT application.id, dog.name AS nickname, breed.name AS breed, dog.age,
-      CONCAT(u.surname, ' ', SUBSTRING(u.name, 1, 1), '. ', SUBSTRING(u.patronymic, 1, 1), '.') AS fio,
-      ring.name AS ring, COUNT(dog_reward.reward_id) AS reward_cnt, application.status FROM "application"
-      LEFT JOIN "dog" ON dog.id = application.dog_id
-      LEFT JOIN "breed" ON breed.id = dog.breed_id
-      LEFT JOIN "user" u ON u.id = dog.user_id
-      LEFT JOIN "ring" ON ring.id = application.ring_id
-      FULL JOIN "dog_reward" ON dog.id = dog_reward.dog_id
-      GROUP BY application.id, nickname, breed, dog.age, fio, ring, application.status`
+      text: `SELECT application.id, dog.name AS nickname, breed.name AS breed,
+      dog.age, CONCAT(u.surname, ' ', SUBSTRING(u.name, 1, 1), '. ', SUBSTRING(u.patronymic, 1, 1), '.') AS fio,
+      ring.name AS ring, specialization,
+      COUNT(dog_reward.reward_id) AS reward_cnt, application.status FROM "application"
+  LEFT JOIN "dog" ON dog.id = application.dog_id
+  LEFT JOIN "breed" ON breed.id = dog.breed_id
+  LEFT JOIN "user" u ON u.id = dog.user_id
+  LEFT JOIN "ring" ON ring.id = application.ring_id
+  LEFT JOIN "dog_reward" ON dog.id = dog_reward.dog_id
+  LEFT JOIN (
+      SELECT
+          ring.id AS ring_id,
+          ARRAY_AGG(DISTINCT breed.name) AS specialization
+      FROM "ring"
+      LEFT JOIN "ring_breed" ON ring.id = ring_breed.ring_id
+      LEFT JOIN "breed" ON breed.id = ring_breed.breed_id
+      GROUP BY ring.id
+  ) AS ring_specializations ON ring.id = ring_specializations.ring_id
+  GROUP BY application.id, nickname, breed, dog.age, fio, ring.name, specialization, application.status`
     }
     const result = await pool.query(query);
     res.json(result.rows);
@@ -350,7 +417,7 @@ app.put('/admin/reject_status', async(req, res) =>{
     await pool.query(rejectStatusQuery);
 
     await pool.query('COMMIT');
-    res.status(200).json({ message: 'Status updated successfully' });
+    res.status(204).json({ message: 'Status updated successfully' });
 
   } catch (error) {
     await pool.query('ROLLBACK')
@@ -371,7 +438,7 @@ app.put('/admin/approve_status', async(req, res) =>{
     await pool.query(approveStatusQuery);
 
     await pool.query('COMMIT');
-    res.status(200).json({ message: 'Status updated successfully' });
+    res.status(204).json({ message: 'Status updated successfully' });
 
   } catch (error) {
     await pool.query('ROLLBACK')
@@ -395,13 +462,256 @@ app.post('/admin/new_participant', async(req, res)=>{
   }
 })
 
+app.get('/admin/dogs', async(req, res) =>{
+  try{
+    const query={
+      text: `SELECT dog.id AS value, CONCAT(dog.name, ' (', CONCAT(u.surname, ' ', u.name, ' ', u.patronymic), ', ', breed.name, ')') AS label FROM "dog"
+      LEFT JOIN "breed" ON breed.id = dog.breed_id
+      LEFT JOIN "user" u On u.id = dog.user_id;`
+    }
+    const result = await pool.query(query);
+    res.json(result.rows);
+  }catch(error) {
+    console.error('Error searching in database:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+app.get('/admin/user_rings', async(req, res) =>{
+  try{
+    const query={
+      text: `SELECT ring.id AS value, 
+      ring.name || ' (' || STRING_AGG(breed.name, ', ') || ')' AS label
+      FROM "ring"
+      LEFT JOIN "ring_breed" ON ring.id = ring_breed.ring_id
+      LEFT JOIN "breed" ON breed.id = ring_breed.breed_id
+      GROUP BY ring.id;`
+    }
+    const result = await pool.query(query);
+    res.json(result.rows);
+  }catch(error) {
+    console.error('Error searching in database:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
 
+app.post('/admin/new_application', async(req, res) =>{
+  const {dog_id, ring_id, status} = req.body
+  try{
+    const existingApplication = await pool.query('SELECT * FROM "application" WHERE dog_id = $1 AND ring_id = $2', [parseInt(dog_id), parseInt(ring_id)]);
+    if (existingApplication.rows.length > 0) {
+      return res.status(400).json({ error: 'Application already exists' });
+    }
+    const query={
+      text: `INSERT INTO "application" (dog_id, ring_id, status) VALUES ($1, $2, $3);`,
+      values: [parseInt(dog_id), parseInt(ring_id), status]
+    }
+    await pool.query(query);
+    res.status(201).json({message: 'Application created successfully'});
+  }catch(error){
+    console.error('Error registering application:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
 
+app.get('/admin/experts', async(req, res) =>{
+  try{
+    const query={
+      text: `SELECT expert_ring.id, CONCAT(u.surname, ' ', u.name, ' ', u.patronymic) AS fio,
+      expert_breed.name AS expert_specialization, ring.name AS ring,
+      ARRAY_AGG(DISTINCT r_br.name) AS ring_specialization, expert_ring.status FROM "expert_ring"
+      LEFT JOIN "expert" ON expert.id = expert_ring.expert_id
+      LEFT JOIN "breed" expert_breed ON expert_breed.id = expert.breed_id
+      LEFT JOIN "user" u ON u.id = expert.user_id
+      LEFT JOIN "ring" ON ring.id = expert_ring.ring_id
+      LEFT JOIN "ring_breed" ON ring.id = ring_breed.ring_id
+      LEFT JOIN "breed" r_br ON ring_breed.breed_id = r_br.id
+      GROUP BY expert_ring.id, fio, expert_breed.name, ring.name, ring.address, expert_ring.status;`
+    }
+    const result = await pool.query(query);
+    res.json(result.rows);
+  }catch(error){
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+
+app.get('/admin/experts_app', async(req, res) =>{
+  try{
+    const query={
+      text: `SELECT expert.id AS value, 
+      CONCAT(u.surname, ' ', u.name, ' ', u.patronymic, ' (' , breed.name , ')') AS label
+      FROM "expert"
+      LEFT JOIN "user" u ON expert.user_id = u.id
+      LEFT JOIN "breed" ON breed.id = expert.breed_id;`
+    }
+    const result = await pool.query(query);
+    res.json(result.rows);
+  }catch(error) {
+    console.error('Error searching in database:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+app.post('/admin/add_expert', async(req, res)=>{
+  const {expert_id, ring_id, status} = req.body
+  try{
+    const existingApplication = await pool.query('SELECT * FROM "expert_ring" WHERE expert_id = $1 AND ring_id = $2', [parseInt(expert_id), parseInt(ring_id)]);
+    if (existingApplication.rows.length > 0) {
+      return res.status(400).json({ error: 'Application already exists' });
+    }
+    const query={
+      text: `INSERT INTO "expert_ring" (expert_id, ring_id, status) VALUES ($1, $2, $3);`,
+      values: [parseInt(expert_id), parseInt(ring_id), status]
+    }
+    await pool.query(query);
+    res.status(201).json({message: 'Application created successfully'});
+  }catch(error){
+    console.error('Error registering application:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+
+app.put('/admin/reject_expert', async(req, res) =>{
+  const expert_ring_id = req.query.id
+  try {
+    await pool.query('BEGIN');
+
+    const rejectStatusQuery = {
+      text: `UPDATE "expert_ring" SET "status" = 'Отклонено'  WHERE id = $1`,
+      values: [parseInt(expert_ring_id)]
+    };
+    await pool.query(rejectStatusQuery);
+
+    await pool.query('COMMIT');
+    res.status(204).json({ message: 'Status updated successfully' });
+
+  } catch (error) {
+    await pool.query('ROLLBACK')
+    console.error('Error updating status:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.put('/admin/approve_expert', async(req, res) =>{
+  const expert_ring_id = req.query.id
+  try {
+    await pool.query('BEGIN');
+
+    const approveStatusQuery = {
+      text: `UPDATE "expert_ring" SET "status" = 'Одобрено' WHERE id = $1`,
+      values: [parseInt(expert_ring_id)]
+    };
+    await pool.query(approveStatusQuery);
+
+    await pool.query('COMMIT');
+    res.status(204).json({ message: 'Status updated successfully' });
+
+  } catch (error) {
+    await pool.query('ROLLBACK')
+    console.error('Error updating status:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+//Эксперт
+
+app.get('/expert/rings', async(req, res) => {
+  try{
+    const query={
+      text: `SELECT ring.id, ring.name, ring.address, ARRAY_AGG(breed.name) as specialization FROM "ring"
+      FULL JOIN "ring_breed" ON ring.id = ring_breed.ring_id
+      LEFT JOIN "breed" ON breed.id = ring_breed.breed_id
+	    GROUP BY ring.id, ring.name, ring.address;`
+    }
+    const result = await pool.query(query);
+    res.status(200).json(result.rows);
+  }catch(error){
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+
+app.post('/expert/new_application', async (req, res) => {
+  const user_id = req.query.expert_id;
+  const ring_id = req.query.ring_id;
+
+  const parsedUserId = parseInt(user_id, 10);
+  const parsedRingId = parseInt(ring_id, 10);
+
+  try {
+    const expertResult = await pool.query(`SELECT expert.id FROM "expert" WHERE user_id = $1`, [parsedUserId]);
+    
+    if (expertResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Expert not found' });
+    }
+
+    const expert_id = expertResult.rows[0].id;
+    const existingPairResult = await pool.query(
+      `SELECT * FROM "expert_ring" WHERE expert_id = $1 AND ring_id = $2`,
+      [expert_id, parsedRingId]
+    );
+
+    if (existingPairResult.rows.length > 0) {
+      return res.status(409).json({ error: 'This expert-ring pair already exists' });
+    }
+    const query = {
+      text: `INSERT INTO "expert_ring" (expert_id, ring_id) VALUES ($1, $2)`,
+      values: [expert_id, parsedRingId]
+    };
+
+    await pool.query(query);
+    res.status(201).json({ message: 'Application created successfully' });
+  } catch (error) {
+    console.error('Error creating application:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/expert/participants', async(req, res)=>{
+  const userId = req.query.id;
+  try{
+    const expertResult = await pool.query(`SELECT expert.id FROM "expert" WHERE user_id = $1`, [parseInt(userId)]);
+    
+    if (expertResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Expert not found' });
+    }
+
+    const expert_id = expertResult.rows[0].id;
+    const query={
+      text: `SELECT DISTINCT dog.name AS nickname, CONCAT(u.surname, ' ', SUBSTRING(u.name, 1, 1), '. ', SUBSTRING(u.patronymic, 1, 1)) AS fio,
+      breed.name AS breed, dog.age AS age, ring.name AS ring FROM "application"
+     LEFT JOIN "dog" ON application.dog_id = dog.id
+     LEFT JOIN "breed" ON dog.breed_id = breed.id
+     LEFT JOIN "user" u ON u.id = dog.user_id
+     LEFT JOIN "expert_ring" ON expert_ring.ring_id = application.ring_id
+     LEFT JOIN "ring" ON expert_ring.ring_id = ring.id
+     WHERE expert_id = $1 AND expert_ring.status = 'Одобрено' AND application.status = 'Одобрено';`,
+     values: [expert_id]
+    }
+    const result = await pool.query(query);
+    res.status(200).json(result.rows);
+  }catch(error){
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
 // Общие маршруты
 app.get('/breeds', async(req, res) => {
   try{
     const query ={
       text: 'SELECT id AS value, name AS label FROM "breed"',
+    }
+    const result = await pool.query(query);
+    res.json(result.rows);
+  }catch(error) {
+    console.error('Error searching in database:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+
+app.get('/rings', async(req, res) =>{
+  try{
+    const query={
+      text: `SELECT ring.id AS value, ring.name || ' (' || STRING_AGG(breed.name, ', ') || '), ' || ring.address AS label AS label FROM "ring"
+      LEFT JOIN "ring_breed" ON ring.id = ring_breed.ring_id
+      LEFT JOIN "breed" ON breed.id = ring_breed.breed_id
+      GROUP BY ring.id;`
     }
     const result = await pool.query(query);
     res.json(result.rows);

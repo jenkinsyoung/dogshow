@@ -25,6 +25,10 @@ header{
     color: rgb(180, 165, 159);
 
 }
+.navbar li a.activeLink {
+    font-weight: bold;
+    color: #060507;
+}
 .image{
     margin-right: 100px;
     width: 40px;

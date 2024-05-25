@@ -77,6 +77,39 @@ app.post('/register', async (req, res) =>{
 
 
 // Маршруты для пользователя
+
+app.put('/update_user', async(req, res)=>{
+  const user_id = req.query.id;
+  const {name, surname, patronymic, email, image} = req.body;
+  if (!user_id) {
+    return res.status(400).json({ error: 'User ID is required' });
+  }
+  try {
+    await pool.query('BEGIN');
+
+    const query = {
+      text: `UPDATE "user"
+             SET name = $1, surname = $2, patronymic = $3, email = $4, image = $5
+             WHERE id = $6 RETURNING *`,
+      values: [name, surname, patronymic, email, image, user_id],
+    };
+    // Выполняем запрос к базе данных
+
+    
+
+    // Отправляем токен клиенту вместо данных пользователя
+    const result = await pool.query(query);
+    const user = result.rows[0];
+    const token = generateToken(user);
+    await pool.query('COMMIT');
+    res.json({ token });
+
+  }catch(error){
+    await pool.query('ROLLBACK')
+    console.error('Error updating status:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
 app.get('/dogs', async(req, res) =>{
   const ownerId = req.query.userId;
   try{
@@ -445,7 +478,7 @@ app.get('/admin/participants', async(req, res) =>{
       text: `SELECT application.id, dog.name AS nickname, breed.name AS breed,
       dog.age, CONCAT(u.surname, ' ', SUBSTRING(u.name, 1, 1), '. ', SUBSTRING(u.patronymic, 1, 1), '.') AS fio,
       ring.name AS ring, specialization,
-      COUNT(dog_reward.reward_id) AS reward_cnt, application.status FROM "application"
+      SUM(dog_reward.count) AS reward_cnt, application.status FROM "application"
   LEFT JOIN "dog" ON dog.id = application.dog_id
   LEFT JOIN "breed" ON breed.id = dog.breed_id
   LEFT JOIN "user" u ON u.id = dog.user_id
@@ -792,7 +825,7 @@ app.get('/breeds', async(req, res) => {
 app.get('/rings', async(req, res) =>{
   try{
     const query={
-      text: `SELECT ring.id AS value, ring.name || ' (' || STRING_AGG(breed.name, ', ') || '), ' || ring.address AS label AS label FROM "ring"
+      text: `SELECT ring.id AS value, ring.name || ' (' || STRING_AGG(breed.name, ', ') || '), ' || ring.address AS label FROM "ring"
       LEFT JOIN "ring_breed" ON ring.id = ring_breed.ring_id
       LEFT JOIN "breed" ON breed.id = ring_breed.breed_id
       GROUP BY ring.id;`
@@ -821,5 +854,3 @@ const pool = new Pool({
   password: 'qwerty',
   port: 5432,
 });
-
-

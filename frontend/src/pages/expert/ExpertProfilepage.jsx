@@ -1,32 +1,32 @@
 import React, { useEffect, useRef, useState } from 'react'
-import style from './Profile.module.css'
-import HeaderUser from '../../components/HeaderUser'
+import style from '../user/Profile.module.css'
+import HeaderExpert from '../../components/HeaderExpert'
 import { jwtDecode } from 'jwt-decode'
 import { useNavigate} from 'react-router-dom';
 import axios from 'axios';
-const ProfilePage = () => {
+const ExpertProfilePage = () => {
   const navigate=useNavigate();
     useEffect(()=>{
         const token = localStorage.getItem('token');
         if(token){
             const decodedToken = jwtDecode(token);
-            if(decodedToken.role_id !== "2") navigate("/forbidden");
+            if(decodedToken.role_id !== "3") navigate("/forbidden");
         }
         
     })
   return (
     <div className='page'>
-        <HeaderUser />
+        <HeaderExpert />
         <main>
-            <Profile />
+            <ExpertProfile />
         </main>
     </div>
   )
 }
 
-export default ProfilePage
+export default ExpertProfilePage
 
-const Profile =() =>{
+const ExpertProfile =() =>{
   const fileInputRef = useRef(null)
   const [id, setId] = useState('')
   const [name, setName] = useState('');
@@ -117,7 +117,7 @@ const Profile =() =>{
     <div style={{marginLeft: '30px', marginTop: '30px'}}>
     <div>
     <div className={style.welcome}><input placeholder={`${surname}`} type='text' onChange={(e)=>setSurname(e.target.value)} required/></div>
-    <div className={style.welcome}><input placeholder={`${name}`} type='text' onChange={(e)=>setName(e.target.value)} required/></div>
+    <div className={style.welcome}><input placeholder={`${name}`} type='text' onChange={(e)=>setName(e.target.value)} required /></div>
     <div className={style.welcome}><input placeholder={`${patronymic}`} type='text' onChange={(e)=>setPatronymic(e.target.value)} /></div>
     </div>
     <div className={style.email}>email: 

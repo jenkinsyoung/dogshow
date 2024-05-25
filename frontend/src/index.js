@@ -21,6 +21,7 @@ import AdminExpertPage from './pages/admin/AdminExpertPage';
 import ExpertParticipantPage from './pages/expert/ExpertParticipantPage';
 import ExpertsPage from './pages/user/ExpertsPage';
 import ExpertRingPage from './pages/expert/ExpertRingPage';
+import ExpertProfilePage from './pages/expert/ExpertProfilepage';
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -32,11 +33,12 @@ const router = createBrowserRouter(
     <Route path="/expert" element={<ExpertHomePage />} />
     <Route path="/expert/participants" element={<ExpertParticipantPage />} />
     <Route path="/expert/rings" element={<ExpertRingPage />} />
-
+    <Route path="/expert/profile" element={<ExpertProfilePage />} />
     <Route path="/home" element={<HomePage />} />
     <Route path="/home/pets" element={<MyPetsPage />} />
     {/* <Route path="/home/rings" element={<RingsPage />} /> */}
     <Route path="/home/experts" element={<ExpertsPage />} />
+
     <Route path="/profile" element={<ProfilePage />} />
     <Route path="/forbidden" element={<Forbidden />} />
     </>

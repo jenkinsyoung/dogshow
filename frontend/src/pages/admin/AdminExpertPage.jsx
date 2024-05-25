@@ -120,7 +120,6 @@ const AdminExpert =()=>{
                 
                 </tr>)}
                 </table>
-                {checkedItems}
             </div>
         </div>
     )

@@ -23,7 +23,8 @@ export default function DogSwiper({photo}) {
         {photo.map((image,index)=><SwiperSlide key ={index} style={{backgroundImage: `url(${image})`,  width: '430px',
     borderRadius: '3px',
     backgroundRepeat: 'no-repeat',
-    backgroundSize: 'cover',}}></SwiperSlide>)}
+    backgroundSize: 'cover',
+    backgroundPosition: 'center'}}></SwiperSlide>)}
       </Swiper>
     </>
   );

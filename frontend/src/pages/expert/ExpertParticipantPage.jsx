@@ -4,6 +4,7 @@ import HeaderExpert from '../../components/HeaderExpert';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
+import AddMark from '../../components/AddMark';
 const ExpertParticipantPage = () => {
     const navigate=useNavigate();
     useEffect(()=>{
@@ -30,10 +31,12 @@ export default ExpertParticipantPage
 const ExpertParticipant =()=>{
     const [overlay, setOverlay] = useState(false)
     const [participants, setParticipant] = useState([])
+    const [userId, setUserId] = useState('')
     useEffect(()=>{
         const token = localStorage.getItem('token');
         const decodedToken = jwtDecode(token);
         const user_id = decodedToken.userId;
+        setUserId(user_id)
         const fetchData = async () => {
             try {
                 const data = await axios.get(`http://localhost:8082/expert/participants?id=${user_id}`);
@@ -44,10 +47,15 @@ const ExpertParticipant =()=>{
         };
         fetchData()   
     }, [])
-
+    const [dogId, setDogId] = useState('')
+    
+     const handleOpen=(id)=>{
+        setOverlay(true)
+        setDogId(id)
+     }
     return(
         <div className={style.container}>
-            {/* {overlay?<AddMark /> : <></>} */}
+            {overlay?<AddMark dog_id = {dogId} user_id = {userId}/> : <></>}
             <div className={style.table}>
                 <table>
                     <tr className={style.title}>
@@ -64,7 +72,7 @@ const ExpertParticipant =()=>{
                 <td>{el.age}</td>
                 <td>{el.fio}</td>
                 <td>{el.ring}</td>
-                <td className={style.card}>Открыть карточку</td>
+                <td className={style.card} onClick={()=>handleOpen(el.id)}>Открыть карточку</td>
                 </tr>)}
                 </table>
             </div>

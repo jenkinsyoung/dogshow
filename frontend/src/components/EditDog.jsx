@@ -85,25 +85,29 @@ const EditDog = ({params}) => {
 
     const onSubmit = async(data) => {
       const new_data = {
+        id: dog.id,
         images: images,
-        name: data.name,
-        age: data.age,
-        vaccination: data.vaccination,
-        breed_id: selectedOption.value,
+        name: data.name || dog.name,
+        age: data.age || dog.age,
+        vaccination: data.vaccination || dog.vaccination,
+        breed_id: selectedOption ? selectedOption.value : dog.breed_id,
+        gold_count: data.gold_count || dog.gold_count,
+        silver_count: data.silver_count || dog.silver_count,
+        bronze_count: data.bronze_count || dog.bronze_count
       }
         try{
-            await axios.post('http://localhost:8082/edit_dog', new_data)           
+            await axios.put('http://localhost:8082/edit_dog', new_data)           
             window.location.reload();
         }
         catch (error){
-            console.error('Error searching:', error);
+            console.error('Error:', error);
         };
     }
   const handleSelectChange = (selected) => {
     setSelectedOption(selected);
   };
 
-  const [images, setImages] = useState(dog.images);
+  const [images, setImages] = useState(dog.images || []);
   const [error, setError] = useState('');
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);

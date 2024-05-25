@@ -121,7 +121,7 @@ const AdminParticipant =() =>{
                 <td>{el.ring}</td>
                 <td>{el.specialization.map(e=><div style={{display: 'flex'}}><span style={{color: 'rgb(255, 181, 167)'}}>◆</span> {e} </div>)}</td>
                 <td>{el.reward_cnt}</td>
-                <td>{el.status}</td>
+                {el.status === 'Одобрено'? <td style={{color: 'green'}}>{el.status}</td> : el.status === 'Отклонено'? <td style={{color: 'red'}}>{el.status}</td> : <td>{el.status}</td>}
                 </tr>)}
                 </table>
             </div>

@@ -133,13 +133,14 @@ app.get('/dogs', async(req, res) =>{
         };
       }
 
-      if (row.criteria && row.value) {
+      if (row.criteria && row.value && row.application_status === 'Одобрено') {
         dogs[row.id].marks.push({
           criteria: row.criteria,
           value: row.value
         });
       }
-      if (row.ring && row.application_status) {
+
+      if (row.ring && row.application_status && !dogs[row.id].rings.some(r => r.ring === row.ring)) {
         dogs[row.id].rings.push({
           ring: row.ring,
           status: row.application_status
@@ -233,11 +234,74 @@ app.delete('/delete_dog', async(req, res) => {
 })
 
 app.put('/edit_dog', async (req, res) => {
-  try{
+  const {id, images, name, age, vaccination, breed_id, gold_count, silver_count, bronze_count} = req.body
+  try {
+    await pool.query('BEGIN');
+    const dogFields = [];
+    const dogValues = [];
+    let fieldIndex = 1;
 
-    res.status(204).json({message: 'Dog successfully updated'})
-  }catch(error){
-    
+    if (name) {
+      dogFields.push(`name = $${fieldIndex++}`);
+      dogValues.push(name);
+    }
+
+    if (age) {
+      dogFields.push(`age = $${fieldIndex++}`);
+      dogValues.push(age);
+    }
+
+    if (vaccination) {
+      dogFields.push(`vaccination = $${fieldIndex++}`);
+      dogValues.push(vaccination);
+    }
+
+    if (breed_id) {
+      dogFields.push(`breed_id = $${fieldIndex++}`);
+      dogValues.push(breed_id);
+    }
+
+    if (dogFields.length > 0) {
+      const updateDogQuery = `UPDATE "dog" SET ${dogFields.join(', ')} WHERE id = $${fieldIndex}`;
+      dogValues.push(id);
+      await pool.query(updateDogQuery, dogValues);
+    }
+
+    if (images && images.length > 0) {
+      await pool.query('DELETE FROM "photo" WHERE dog_id = $1', [id]);
+
+      const insertPhotoQuery = 'INSERT INTO "photo" (dog_id, image) VALUES ($1, $2)';
+      for (const image of images) {
+        await pool.query(insertPhotoQuery, [id, image]);
+      }
+    }
+
+    const updateRewardQuery = `
+      INSERT INTO "dog_reward" (dog_id, reward_id, count)
+      VALUES ($1, $2, $3)
+      ON CONFLICT (dog_id, reward_id)
+      DO UPDATE SET count = EXCLUDED.count
+    `;
+
+    if (gold_count !== undefined) {
+      await pool.query(updateRewardQuery, [id, 1, gold_count]);
+    }
+
+    if (silver_count !== undefined) {
+      await pool.query(updateRewardQuery, [id, 2, silver_count]);
+    }
+
+    if (bronze_count !== undefined) {
+      await pool.query(updateRewardQuery, [id, 3, bronze_count]);
+    }
+
+    await pool.query('COMMIT');
+
+    res.status(204).json({ message: 'Dog data updated successfully' });
+  } catch (error) {
+    await pool.query('ROLLBACK');
+    console.error('Error updating dog data:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 })
 
@@ -675,7 +739,7 @@ app.get('/expert/participants', async(req, res)=>{
 
     const expert_id = expertResult.rows[0].id;
     const query={
-      text: `SELECT DISTINCT dog.name AS nickname, CONCAT(u.surname, ' ', SUBSTRING(u.name, 1, 1), '. ', SUBSTRING(u.patronymic, 1, 1)) AS fio,
+      text: `SELECT DISTINCT dog.id AS id, dog.name AS nickname, CONCAT(u.surname, ' ', SUBSTRING(u.name, 1, 1), '. ', SUBSTRING(u.patronymic, 1, 1)) AS fio,
       breed.name AS breed, dog.age AS age, ring.name AS ring FROM "application"
      LEFT JOIN "dog" ON application.dog_id = dog.id
      LEFT JOIN "breed" ON dog.breed_id = breed.id
@@ -690,6 +754,26 @@ app.get('/expert/participants', async(req, res)=>{
   }catch(error){
     res.status(500).json({ error: 'Internal server error' });
   }
+})
+
+app.post('/expert/add_mark', async(req, res) =>{
+  const { dog_id, user_id } = req.query;
+    const { criterion1, criterion2, criterion3, criterion4, criterion5 } = req.body;
+
+    try {
+        const expertResult = await pool.query('SELECT expert.id FROM "expert" WHERE user_id = $1', [user_id]);
+        const expertId = expertResult.rows[0].id;
+
+        await pool.query(
+            'INSERT INTO "mark" (dog_id, expert_id, criterion_id, value) VALUES ($1, $2, $3, $4), ($1, $2, $5, $6), ($1, $2, $7, $8), ($1, $2, $9, $10), ($1, $2, $11, $12)',
+            [dog_id, expertId, 1, criterion1, 2, criterion2, 3, criterion3, 4, criterion4, 5, criterion5]
+        );
+
+        res.status(201).json({ message: 'Марки успешно добавлены' });
+    } catch (error) {
+        console.error('Ошибка при добавлении марок:', error);
+        res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
 })
 // Общие маршруты
 app.get('/breeds', async(req, res) => {

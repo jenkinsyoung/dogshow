@@ -7,11 +7,11 @@ const ExpertUI = ({expert}) => {
             <div className={style.photo} style={{backgroundImage: `url(${expert.image})`}}/>
             <div className={style.name}>{expert.fio}</div>
             <div className={style.specialization}>
-                <p>Специализация: </p>
+                <p style={{paddingRight: '5px'}}>Специализация:</p>
                 <span>{expert.breed}</span>
             </div>
             <div className={style.specialization}>
-                <p>email: </p>
+                <p style={{paddingRight: '5px'}}>email: </p>
                 <span>{expert.email}</span>
             </div>
         </div>

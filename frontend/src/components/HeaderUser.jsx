@@ -25,14 +25,6 @@ const HeaderUser = () => {
                 </li>
                 <li>
                     <NavLink 
-                        to="/home/rings" 
-                        className={({ isActive }) => isActive ? style.activeLink : undefined}
-                    >
-                        Ринги
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink 
                         to="/home/experts" 
                         className={({ isActive }) => isActive ? style.activeLink : undefined}
                     >

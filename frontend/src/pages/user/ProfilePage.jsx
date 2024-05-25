@@ -4,6 +4,7 @@ import HeaderUser from '../../components/HeaderUser'
 import { jwtDecode } from 'jwt-decode'
 import { useNavigate} from 'react-router-dom';
 import axios from 'axios';
+import Checkbox from '../../components/Checkbox';
 const ProfilePage = () => {
   const navigate=useNavigate();
     useEffect(()=>{
@@ -35,6 +36,7 @@ const Profile =() =>{
   const [image, setImage] = useState('')
   const [email, setEmail] = useState('')
   const [passport, setPassport] = useState('')
+  const [applications, setApplication] = useState([])
   useEffect(()=>{
     const token = localStorage.getItem('token');
   if(token){
@@ -47,7 +49,16 @@ const Profile =() =>{
     setEmail(decodedToken.email);
     setPassport(decodedToken.passport)
   }
-  }, [])
+    const fetchData = async() =>{
+      try{
+          const data = await axios.get(`http://localhost:8082/user/applications?id=${id}`)
+          setApplication(data.data);
+      }catch(error){
+          console.log(error)
+      }
+  }
+    fetchData()
+  }, [id])
 
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
@@ -99,6 +110,35 @@ const Profile =() =>{
       console.log(error)
     }
   }
+
+  const [checkedItems, setCheckedItems] = useState([]);
+
+const handleCheckBoxChange = (index) => {
+  setCheckedItems(prevState => {
+    if (prevState.includes(index)) {
+      return prevState.filter(item => item !== index);
+    } else {
+      return [...prevState, index];
+    }
+  });
+};
+
+const handleDelete=async (checkedItems)=>{
+  async function deleteData(id){
+      try{
+          await axios.delete(`http://localhost:8082/delete_application?id=${id}` )
+      }catch(error){
+          console.log(error)
+      }
+  }
+  if (checkedItems.length !== 0){
+      await Promise.all(checkedItems.map(id => deleteData(id)));
+      window.location.reload();
+  }
+
+  else{alert('Не выбран участник')}
+
+}
   return(
     <div className={style.container}>
       <div style={{display: 'flex'}}>
@@ -132,6 +172,20 @@ const Profile =() =>{
     <button className={style.btn}  onClick={handleSave}>Сохранить данные</button></div>
     </div>
     </div>
+    <div className={style.application}>
+        <div className={style.title}>Ваши заявки</div>
+        {applications.length !== 0 ? applications.map(el =><tr key={el.id}>
+           <td> <Checkbox key={el.id}
+            index={el.id}
+            onChange={handleCheckBoxChange}/></td>
+            <td>{el.nickname}</td>
+            <td>{el.ring}</td>
+           -- {el.status === 'Одобрено'? <td style={{color: 'green'}}>{el.status}</td> : el.status === 'Отклонено'? <td style={{color: 'red'}}>{el.status}</td> : <td>{el.status}</td>}
+        </tr>): <></>}
+        <div style={{display:'flex', justifyContent:'right'}}>
+                <button className={style.delete} onClick={() => handleDelete(checkedItems)}>Удалить заявки</button>
+        </div>
+      </div>
     </div>
   )
 }

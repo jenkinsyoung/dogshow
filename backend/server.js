@@ -357,7 +357,34 @@ app.post('/new_application', async(req, res) =>{
   }
 })
 
-app.delete('/delete_application')
+app.get('/user/applications', async(req, res)=>{
+  const userId = req.query.id;
+  try{
+    const query = {
+      text: `SELECT application.id, dog.name AS nickname, ring.name AS ring, application.status FROM "application"
+      LEFT JOIN "ring" ON ring.id = application.ring_id
+      LEFT JOIN "dog" ON application.dog_id = dog.id
+      LEFT JOIN "user" u ON u.id = dog.user_id
+      WHERE u.id = $1;`,
+      values: [userId]
+    }
+    const result = await pool.query(query);
+    res.json(result.rows);
+  }catch(error){
+    console.error('Error searching in database:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+app.delete('/delete_application', async(req, res)=>{
+  const id = req.query.id;
+  try{
+    await pool.query(`DELETE FROM "application" WHERE application.id = $1`, [id]);
+    res.status(200).json({message: 'Application deleted successfully'})
+  }catch(error){
+    console.error('Error deleting application:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
 
 app.get('/experts', async(req, res) =>{
   try{
@@ -807,6 +834,73 @@ app.post('/expert/add_mark', async(req, res) =>{
         console.error('Ошибка при добавлении марок:', error);
         res.status(500).json({ error: 'Внутренняя ошибка сервера' });
     }
+})
+
+app.get('/expert/applications', async(req, res)=>{
+  const userId = req.query.id;
+
+  try{
+    const query = {
+      text: `SELECT expert_ring.id, ring.name AS ring, expert_ring.status FROM "expert_ring"
+      LEFT JOIN "ring" ON ring.id = expert_ring.ring_id
+      LEFT JOIN "expert" ON expert_ring.expert_id = expert.id
+      LEFT JOIN "user" u ON u.id = expert.user_id
+      WHERE u.id = $1;`,
+      values: [userId]
+    }
+    const result = await pool.query(query);
+    res.json(result.rows);
+  }catch(error){
+    console.error('Error searching in database:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+
+app.delete('/expert/delete_application', async(req, res) =>{
+  const id = req.query.id;
+  try{
+    await pool.query(`DELETE FROM "expert_ring" WHERE expert_ring.id = $1`, [id]);
+    res.status(200).json({message: 'Application deleted successfully'})
+  }catch(error){
+    console.error('Error deleting application:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+app.get('/expert/info', async(req, res)=>{
+  const id = req.query.id;
+  try{
+    const query = {
+      text: `SELECT breed.name AS breed FROM "expert"
+      LEFT JOIN "breed" ON breed.id = expert.breed_id
+      LEFT JOIN "user" u ON u.id = expert.user_id
+      WHERE u.id = $1;`,
+      values: [id]
+    }
+    const result = await pool.query(query);
+    res.json(result.rows);
+  }catch(error){
+    console.error('Error searching in database:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+})
+
+app.put('/expert/update_specialization', async (req, res)=>{
+  const id = req.query.id;
+  const {specialization} = req.body
+  try{
+    if (specialization){
+      const query = {
+        text: `UPDATE "expert" SET breed_id = $1 WHERE user_id = $2`,
+        values: [specialization, id]
+      };
+      await pool.query(query);
+      res.status(204).json({ message: 'Specialization updated successfully' });
+    } else {
+      res.status(400).json({ error: 'breed_id is required' });}
+  }catch(error){
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 })
 // Общие маршруты
 app.get('/breeds', async(req, res) => {

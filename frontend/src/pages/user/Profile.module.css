@@ -73,3 +73,34 @@ input::placeholder{
     font-size: 20px;
 
 }
+
+.title{
+    width: 100%;
+    font-size: 24px;
+    text-align: center;
+    margin-top:15px;
+}
+
+.application td{
+    height: 20px;
+    border:none
+}
+
+.delete{
+    width: 241px;
+    height: 34px;
+    box-sizing: border-box;
+    border: 2px solid rgb(255, 0, 0);
+    border-radius: 3px;
+    background: rgb(255, 255, 255);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 19px;
+    letter-spacing: 0px;
+    text-align: center;
+    margin-left: 10px;
+}
+.delete:hover{
+    border: 2px solid rgb(255, 0, 0);
+    background: rgba(255, 27, 27, 0.3);
+}

@@ -40,7 +40,7 @@ const HeaderAdmin = () => {
                 </NavLink>
             </li>
         </nav>
-        <NavLink to="/profile">
+        <NavLink to="/admin/profile">
             <img className={style.profile} src='/profile.svg' alt=''/>
         </NavLink>
         <img className={style.out} onClick={logout} src='/logout.svg' alt=''/>

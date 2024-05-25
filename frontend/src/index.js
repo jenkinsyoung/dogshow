@@ -21,7 +21,10 @@ import AdminExpertPage from './pages/admin/AdminExpertPage';
 import ExpertParticipantPage from './pages/expert/ExpertParticipantPage';
 import ExpertsPage from './pages/user/ExpertsPage';
 import ExpertRingPage from './pages/expert/ExpertRingPage';
-import ExpertProfilePage from './pages/expert/ExpertProfilepage';
+import AdminProfilePage from './pages/admin/AdminProfile';
+import ExpertProfilePage from './pages/expert/ExpertProfile';
+
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -30,6 +33,7 @@ const router = createBrowserRouter(
     <Route path="/admin/rings" element={<AdminRingPage />} />
     <Route path="/admin/participants" element={<AdminParticipantPage />} />
     <Route path="/admin/experts" element={<AdminExpertPage />} />
+    <Route path="/admin/profile" element={<AdminProfilePage />} />
     <Route path="/expert" element={<ExpertHomePage />} />
     <Route path="/expert/participants" element={<ExpertParticipantPage />} />
     <Route path="/expert/rings" element={<ExpertRingPage />} />

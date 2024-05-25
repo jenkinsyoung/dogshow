@@ -80,7 +80,7 @@ app.post('/register', async (req, res) =>{
 
 app.put('/update_user', async(req, res)=>{
   const user_id = req.query.id;
-  const {name, surname, patronymic, email, image} = req.body;
+  const {name, surname, patronymic, email, image, passport} = req.body;
   if (!user_id) {
     return res.status(400).json({ error: 'User ID is required' });
   }
@@ -89,9 +89,9 @@ app.put('/update_user', async(req, res)=>{
 
     const query = {
       text: `UPDATE "user"
-             SET name = $1, surname = $2, patronymic = $3, email = $4, image = $5
+             SET name = $1, surname = $2, patronymic = $3, email = $4, image = $5, passport = $7
              WHERE id = $6 RETURNING *`,
-      values: [name, surname, patronymic, email, image, user_id],
+      values: [name, surname, patronymic, email, image, user_id, passport],
     };
     // Выполняем запрос к базе данных
 

@@ -1,32 +1,32 @@
 import React, { useEffect, useRef, useState } from 'react'
-import style from '../user/Profile.module.css'
-import HeaderExpert from '../../components/HeaderExpert'
+import style from './AdminProfilePage.module.css'
+import HeaderAdmin from '../../components/HeaderAdmin'
 import { jwtDecode } from 'jwt-decode'
 import { useNavigate} from 'react-router-dom';
 import axios from 'axios';
-const ExpertProfilePage = () => {
+const AdminProfilePage = () => {
   const navigate=useNavigate();
     useEffect(()=>{
         const token = localStorage.getItem('token');
         if(token){
             const decodedToken = jwtDecode(token);
-            if(decodedToken.role_id !== "3") navigate("/forbidden");
+            if(decodedToken.role_id !== "1") navigate("/forbidden");
         }
         
     })
   return (
     <div className='page'>
-        <HeaderExpert />
+        <HeaderAdmin />
         <main>
-            <ExpertProfile />
+            <Profile />
         </main>
     </div>
   )
 }
 
-export default ExpertProfilePage
+export default AdminProfilePage
 
-const ExpertProfile =() =>{
+const Profile =() =>{
   const fileInputRef = useRef(null)
   const [id, setId] = useState('')
   const [name, setName] = useState('');
@@ -34,7 +34,7 @@ const ExpertProfile =() =>{
   const [patronymic, setPatronymic] = useState('');
   const [image, setImage] = useState('')
   const [email, setEmail] = useState('')
-
+  const [passport, setPassport] = useState('')
   useEffect(()=>{
     const token = localStorage.getItem('token');
   if(token){
@@ -45,6 +45,7 @@ const ExpertProfile =() =>{
     setPatronymic(decodedToken.patronymic);
     setImage(decodedToken.image);
     setEmail(decodedToken.email);
+    setPassport(decodedToken.passport)
   }
   }, [])
 
@@ -85,6 +86,7 @@ const ExpertProfile =() =>{
       surname: surname, 
       patronymic: patronymic,
       email: email,
+      passport: passport,
       image: image[0].length > 1 ? image[0] : image
     }
     console.log(new_data)
@@ -92,7 +94,7 @@ const ExpertProfile =() =>{
      const response = await axios.put(`http://localhost:8082/update_user?id=${id}`, new_data)
      const newToken = response.data.token;
      localStorage.setItem('token', newToken);
-     alert('User updated successfully and token refreshed.');
+     alert('Ваши данные успешно обновлены.');
     }catch(error){
       console.log(error)
     }
@@ -117,16 +119,20 @@ const ExpertProfile =() =>{
     <div style={{marginLeft: '30px', marginTop: '30px'}}>
     <div>
     <div className={style.welcome}><input placeholder={`${surname}`} type='text' onChange={(e)=>setSurname(e.target.value)} required/></div>
-    <div className={style.welcome}><input placeholder={`${name}`} type='text' onChange={(e)=>setName(e.target.value)} required /></div>
+    <div className={style.welcome}><input placeholder={`${name}`} type='text' onChange={(e)=>setName(e.target.value)} required/></div>
     <div className={style.welcome}><input placeholder={`${patronymic}`} type='text' onChange={(e)=>setPatronymic(e.target.value)} /></div>
     </div>
     <div className={style.email}>email: 
         <input placeholder={`${email}`} type='email' onChange={handleChangeEmail} />
     </div>
+    <div className={style.passport}>Серия и номер паспорта: 
+        <input placeholder={`${passport}`} type='text' onChange={(e)=>setPassport(e.target.value)} />
+    </div>
+  <div style={{width: '100%', height: 'max-content', display:'flex'}}>
+    <button className={style.btn}  onClick={handleSave}>Сохранить данные</button>
+  </div>
     </div>
     </div>
-  <div style={{width: '100%', height: 'max-content', display:'flex', justifyContent: 'right'}}>
-    <button className={style.btn}  onClick={handleSave}>Сохранить данные</button></div>
     </div>
   )
 }

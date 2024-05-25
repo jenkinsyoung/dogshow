@@ -34,7 +34,7 @@ const Profile =() =>{
   const [patronymic, setPatronymic] = useState('');
   const [image, setImage] = useState('')
   const [email, setEmail] = useState('')
-
+  const [passport, setPassport] = useState('')
   useEffect(()=>{
     const token = localStorage.getItem('token');
   if(token){
@@ -45,6 +45,7 @@ const Profile =() =>{
     setPatronymic(decodedToken.patronymic);
     setImage(decodedToken.image);
     setEmail(decodedToken.email);
+    setPassport(decodedToken.passport)
   }
   }, [])
 
@@ -85,6 +86,7 @@ const Profile =() =>{
       surname: surname, 
       patronymic: patronymic,
       email: email,
+      passport: passport,
       image: image[0].length > 1 ? image[0] : image
     }
     console.log(new_data)
@@ -92,7 +94,7 @@ const Profile =() =>{
      const response = await axios.put(`http://localhost:8082/update_user?id=${id}`, new_data)
      const newToken = response.data.token;
      localStorage.setItem('token', newToken);
-     alert('User updated successfully and token refreshed.');
+     alert('Ваши данные успешно обновлены.');
     }catch(error){
       console.log(error)
     }
@@ -123,10 +125,13 @@ const Profile =() =>{
     <div className={style.email}>email: 
         <input placeholder={`${email}`} type='email' onChange={handleChangeEmail} />
     </div>
+    <div className={style.passport}>Серия и номер паспорта: 
+        <input placeholder={`${passport}`} type='text' onChange={(e)=>setPassport(e.target.value)} />
     </div>
-    </div>
-  <div style={{width: '100%', height: 'max-content', display:'flex', justifyContent: 'right'}}>
+  <div style={{width: '100%', height: 'max-content', display:'flex'}}>
     <button className={style.btn}  onClick={handleSave}>Сохранить данные</button></div>
+    </div>
+    </div>
     </div>
   )
 }

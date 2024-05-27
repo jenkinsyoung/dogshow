@@ -60,7 +60,7 @@ const SignIn = () => {
           localStorage.setItem('token', data.data.token);
         });
         
-        navigate("/home")
+        navigate("/")
     }
     catch (error){
         console.error('Error searching:', error);
